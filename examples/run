@@ -1,0 +1,5 @@
+#!/bin/sh
+
+DIR=`echo $0 | sed 's/run$//'`
+LD_LIBRARY_PATH=${DIR}:$LD_LIBRARY_PATH
+java -cp ${DIR}/.. examples.Main
