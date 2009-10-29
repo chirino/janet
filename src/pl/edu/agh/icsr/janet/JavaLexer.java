@@ -642,7 +642,7 @@ havenumber:
         return in.getCurrentLine();
     }
 
-    public final InputBuffer ibuf() {
+    public final JanetSourceReader ibuf() {
         return in.ibuf();
     }
 

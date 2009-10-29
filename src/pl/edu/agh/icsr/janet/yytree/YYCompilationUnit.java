@@ -37,6 +37,8 @@
 package pl.edu.agh.icsr.janet.yytree;
 
 import java.util.*;
+import java.io.File;
+import java.net.URL;
 import pl.edu.agh.icsr.janet.*;
 import pl.edu.agh.icsr.janet.reflect.*;
 
@@ -52,12 +54,17 @@ public class YYCompilationUnit extends YYNode implements IScope {
     CompilationManager mgr;
     YYPackage pkg;
     YYImportDeclarationList imports;
+    boolean markedForProcessing;
+    String libName;
 
     Map singles;
 
-    public YYCompilationUnit(IJavaContext cxt, CompilationManager mgr) {
+    public YYCompilationUnit(IJavaContext cxt, CompilationManager mgr,
+        boolean doProcess)
+    {
         super(cxt);
         this.mgr = mgr;
+        this.markedForProcessing = doProcess;
         mgr.addCompilationUnit(this);
     }
 
@@ -67,8 +74,7 @@ public class YYCompilationUnit extends YYNode implements IScope {
         return this;
     }
 
-    public YYCompilationUnit setImportDeclarations(
-            YYImportDeclarationList imports) {
+    public YYCompilationUnit setImportDeclarations(YYImportDeclarationList imports) {
         ensureUnlocked();
         this.imports = imports;
         return this;
@@ -98,7 +104,7 @@ public class YYCompilationUnit extends YYNode implements IScope {
     }
 */
 
-    public Map getSingleImportDeclarations() throws CompileException {
+    public Map getSingleImportDeclarations() throws ParseException {
         Map m = imports.getSingles();
         if (singles == null) {
             lock();
@@ -133,7 +139,7 @@ public class YYCompilationUnit extends YYNode implements IScope {
     }
 
     public void write(Writer w) throws java.io.IOException {
-        w.getSubstituter().setSubst("BASEFILE", ibuf().getFileName());
+        w.getSubstituter().setSubst("BASEFILE", ibuf().getOriginFile().getName());
         w.write(Janet.getGeneratedCodeLicense());
         w.write(janetHeader, true);
         super.write(w);
@@ -191,8 +197,9 @@ public class YYCompilationUnit extends YYNode implements IScope {
     public IScope getCurrentMember() { return null; }
     public YYClass getCurrentClass() { return null; }
 
-    public String toString() {
-        return "Compilation unit: " + ibuf().getFileName();
-    }
+    public boolean markedForProcessing() { return markedForProcessing; }
 
+    public String toString() {
+        return "Compilation unit: " + ibuf().getOriginAsString();
+    }
 }

@@ -49,7 +49,7 @@ public class YYExpressionStatement extends YYStatement {
         this.expr = expr;
     }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         expr.resolve();
         addExceptions(expr.getExceptionsThrown());
     }

@@ -66,8 +66,8 @@ import java.lang.reflect.Modifier; // for Modifiers productions
 
 
 /* The template file is based on parser templates defined in JB and
- * (indirectly) bison, and is therefore subject to GPL license as shown 
- * below. The JANET MPL 1.1 license do not apply in this case. Note that 
+ * (indirectly) bison, and is therefore subject to GPL license as shown
+ * below. The JANET MPL 1.1 license do not apply in this case. Note that
  * the template file is not an integral part of JANET and does not affect
  * JANET licensing.
  */
@@ -130,10 +130,10 @@ public class EmbeddedParser {
 
 // CONSTANTS
 
-public static final int YYFINAL = 367;
-public static final int YYFLAG = -32768;
-public static final int YYNTBASE = 119;
-public static final int YYLAST = 1412;
+static public final int YYFINAL = 367;
+static public final int YYFLAG = -32768;
+static public final int YYNTBASE = 119;
+static public final int YYLAST = 1412;
 
 
     protected int yyreturn; // see ACTIONS switch
@@ -180,8 +180,8 @@ public static final int YYLAST = 1412;
 
 // PROCS
 
-static final int YYTRANSLATE(int x)
-	{ return ((x) <= 347 ? yytranslate[x] : 223);}
+final int YYTRANSLATE(int x)
+	{ return ((x) <= 348 ? yytranslate[x] : 223);}
 
 
     // default constructor for newInstance()
@@ -232,7 +232,7 @@ static final int YYTRANSLATE(int x)
 	    return yyresult;
 	}
     }
-	
+
     int _parse() throws ParseException {
 	int ok;
 	yychar1 = 0;  /* lookahead Token as an internal (translated) */
@@ -242,19 +242,19 @@ static final int YYTRANSLATE(int x)
 	yychar = YYEMPTY;  /* Cause a Token to be read.  */
 	yyval = null;
 	Goto = yynewstate;
-	
+
 	/* Initialize stack pointers.
 	   Waste one element of value and location stack
 	   so that they stay on the same level as the state stack.
 	   The wasted elements are never initialized.  */
-  
+
 	yyss.clear();
 	yyvs.clear();
 	yyls.clear();
-    
+
 	/* need to push a null value to match state 0 */
 	yyvs.push(null);
-  
+
 	if (yydebug > 0) yyprint("Starting parse\n");
 
 	/* Push a new state, which is found in	yystate	 .  */
@@ -272,7 +272,7 @@ static final int YYTRANSLATE(int x)
 		yyprint(yystate);
 		yyprint("\n");
 	    }
-	    
+
 	case yybackup:
 
 	    /* Do appropriate processing given the current state.  */
@@ -283,7 +283,7 @@ static final int YYTRANSLATE(int x)
 
 	    yyn = yypact[yystate];
 	    if (yyn == YYFLAG) {
-		Goto = yydefault; 
+		Goto = yydefault;
 		break branch;
 	    }
 
@@ -329,7 +329,7 @@ static final int YYTRANSLATE(int x)
 	    }
 
 	    yyn = yytable[yyn];
-	    
+
 	    /* yyn is what to do for this token type in this state.
 	       Negative => reduce, -yyn is rule number.
 	       Positive => shift, yyn is new state.
@@ -350,7 +350,7 @@ static final int YYTRANSLATE(int x)
 	    if (yyn == YYFINAL) return YYACCEPT;
 
 	    /* Shift the lookahead token.	 */
-	    
+
 	    if (yydebug > 0) {
 		yyprint("Shifting token ");
 		yyprint(yychar);
@@ -361,7 +361,7 @@ static final int YYTRANSLATE(int x)
 
 	    /* Discard the token being shifted unless it is eof.	*/
 	    if (yychar != YYEOF) yychar = YYEMPTY;
-	    
+
 	    yyvs.push(yylval);
 	    yylend.copyFrom(loc);
 	    yyls.push(yylex.tokenloc());
@@ -408,14 +408,14 @@ static final int YYTRANSLATE(int x)
 	    }
 
 	    /*$*/	/* the action file gets copied in in place of this dollarsign */
-	    
+
 	    /* Provide a way to avoid having return statements in the actions
 	       and so avoid "statement not reached" errors"
 	    */
 	    yyreturn = YYCONTINUE;
 
 	    switch (yyn) {
-		
+
 case 1:
 {;
     break;}
@@ -973,16 +973,16 @@ case 240:
     break;}
 }
 
-	    
+
 
 	    if(yyreturn == YYERROR) {
 		Goto = yyerrlab1; break branch;
 	    } else if(yyreturn != YYCONTINUE) { yylex.skipWhites(); return yyreturn; }
-	    
+
 	    yyvs.popn(yylen);
 	    yyss.popn(yylen);
 	    /* yyls.popn(yylen); */
-	    
+
 	    yyvs.push(yyval);
 	    /*  yylsp++;*/
 	    if (yylen == 0) {
@@ -990,30 +990,30 @@ case 240:
 	    } else {
 		yyls.popn(yylen-1);
 	    }
-	    
+
 	    if (yydebug > 0) {
-		stackdump("state stack now"); 
+		stackdump("state stack now");
 		lstackdump("location stack now");
 	    }
-	    
+
 	    /* Now "shift" the result of the reduction.
 	       Determine what state that goes to,
 	       based on the state we popped back to
 	       and the rule number reduced by.  */
-	    
+
 	    yyn = yyr1[yyn];
-	    
+
 	    yystate = yypgoto[yyn - YYNTBASE] + yyss.peek();
 	    if (yystate >= 0 && yystate <= YYLAST && yycheck[yystate] == yyss.peek()) {
 		yystate = yytable[yystate];
 	    } else {
 		yystate = yydefgoto[yyn - YYNTBASE];
 	    }
-	    
+
 	    Goto = yynewstate; break branch;
-	    
+
 	case yyerrlab:	 /* here on detecting error */
-	    
+
 	    if (yyerrstatus == 0) {
 		/* If not already recovering from an error, report this error.  */
 		++yynerrs;
@@ -1021,9 +1021,9 @@ case 240:
 	    }
 
 	case yyerrlab1:	  /* here on error raised explicitly by an action */
-	    
+
 	    if (yyerrstatus == yyshiftcount) {
-		/* if just tried and failed to reuse lookahead token 
+		/* if just tried and failed to reuse lookahead token
 		   after an error, discard it.	*/
 		/* return failure if at end of input */
 		if (yychar == YYEOF) {
@@ -1044,9 +1044,9 @@ case 240:
 
 	    /* Else will try to reuse lookahead token
 	       after shifting the error token.  */
-	    
+
 	    yyerrstatus = yyshiftcount;	/* Each real token shifted decrements this */
-	    
+
 	    Goto = yyerrhandle; break branch;
 
 	case yyerrdefault:  /* state does notthing special for the error token. */
@@ -1062,18 +1062,18 @@ case 240:
 	    yystate = yyss.top();
 	    yyls.popn(1);
 
-	    if (yydebug > 0) { 
-		stackdump("Error: state stack now"); 
+	    if (yydebug > 0) {
+		stackdump("Error: state stack now");
 		lstackdump("Error: location stack now");
 	    }
-	    
+
 	case yyerrhandle:
 
 	    yyn = yypact[yystate];
 	    if (yyn == YYFLAG) {
 		Goto = yyerrdefault; break branch;
 	    }
-	    
+
 	    yyn += YYTERROR;
 	    if (yyn < 0 || yyn > YYLAST || yycheck[yyn] != YYTERROR) {
 		Goto = yyerrdefault; break branch;
@@ -1124,7 +1124,7 @@ case 240:
 	    int yychar1; // a TRANSLATEd char value
 	    int count;
 	    count = 0;
-	    
+
 	    /* Start yychar1 at -yyn if nec to avoid negative indexes in yycheck.*/
 	    for (yychar1 = (yyn < 0 ? -yyn : 0);
 		 (yyn+yychar1) < (yytname.length);
@@ -1177,11 +1177,11 @@ case 240:
 	    String line = yyline();
 	    if(line != null) {
 		if(cno >= line.length()) cno = line.length();
-		if(line.charAt(line.length()-1) == EOL) 
+		if(line.charAt(line.length()-1) == EOL)
 		    yyprint(line);
 		else
 		    yyprintln(line);
-		
+
 		// for(int i=0;i<cno;i++) yyprint(" ");
 		/* Modified by Dawid Kurzyniec, February 2000 */
 		for (int i=0; i<cno; i++) {
@@ -1191,7 +1191,7 @@ case 240:
 		    else
 			yyprint(" ");
 		}
-		
+
 		yyprintln("^");
 	    }
 	}
@@ -1233,7 +1233,7 @@ case 240:
 	}
 	yyprint("\n");
     }
-    
+
     protected void lstackdump(String s) {
 	int i;
 	int lsp1 = yyls.size();
@@ -1246,7 +1246,7 @@ case 240:
 		yyprint("  ");
 		yyprint("" + x);
 	    }
-	    yyprint("  <-->  " + yylend); 
+	    yyprint("  <-->  " + yylend);
 	}
 	yyprint("\n");
     }
@@ -1262,18 +1262,16 @@ case 240:
     public final pl.edu.agh.icsr.janet.YYLocation lbeg() { return yylbeg; }
     public final pl.edu.agh.icsr.janet.YYLocation lend() { return yylend; }
     public final pl.edu.agh.icsr.janet.YYLocation loc(int pos) { return yyls.tth(pos-yylen); }
-    
+
     protected void yyprint(Object x) { yyerr.print(x); yyerr.flush(); }
     protected void yyprintln(Object x) { yyerr.println(x); yyerr.flush(); }
     protected void yyprint(int x) { yyerr.print(x); yyerr.flush(); }
     protected void yyprintln(int x) { yyerr.println(x); yyerr.flush(); }
-    
+
 // TABLES
 
-public static final int yytranslate[] = yytranslateTableCreator();
-
-private static final int[] yytranslateTableCreator() {
-  final int yytranslate[] = {
+static public final int yytranslate[] = create$yytranslate();
+private static int[] create$yytranslate() { return new int[] {
      0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -1300,25 +1298,21 @@ private static final int[] yytranslateTableCreator() {
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-     2,     2,     2,     2,     2,     1,     3,     4,     5,     6,
-     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,
-    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
-    27,    28,    29,    30,    31,    32,    33,    34,    35,    36,
-    37,    38,    39,    40,    41,    42,    43,    44,    45,    46,
-    47,    48,    49,    50,    51,    52,    53,    54,    55,    56,
-    57,    58,    59,    60,    61,    62,    63,    64,    65,    66,
-    67,    68,    69,    70,    71,    72,    73,    74,    75,    76,
-    77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-    87,    88,    89,    90,    91,    92,    93
+     2,     2,     2,     2,     2,     1,     2,     3,     4,     5,
+     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,
+    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,
+    26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
+    36,    37,    38,    39,    40,    41,    42,    43,    44,    45,
+    46,    47,    48,    49,    50,    51,    52,    53,    54,    55,
+    56,    57,    58,    59,    60,    61,    62,    63,    64,    65,
+    66,    67,    68,    69,    70,    71,    72,    73,    74,    75,
+    76,    77,    78,    79,    80,    81,    82,    83,    84,    85,
+    86,    87,    88,    89,    90,    91,    92,    93
 
-  };
-  return yytranslate;
-}
+}; }
 
-public static final int yyprhs[] = yyprhsTableCreator();
-
-private static final int[] yyprhsTableCreator() {
-  final int yyprhs[] = {
+static public final int yyprhs[] = create$yyprhs();
+private static int[] create$yyprhs() { return new int[] {
      0,
      0,     2,     5,     7,     9,    11,    12,    14,    17,    19,
     21,    23,    26,    28,    30,    32,    34,    36,    38,    40,
@@ -1346,14 +1340,10 @@ private static final int[] yyprhsTableCreator() {
    668,   670,   672,   674,   676,   678,   680,   682,   684,   686,
    688
 
-  };
-  return yyprhs;
-}
+}; }
 
-public static final int yyrhs[] = yyrhsTableCreator();
-
-private static final int[] yyrhsTableCreator() {
-  final int yyrhs[] = {
+static public final int yyrhs[] = create$yyrhs();
+private static int[] create$yyrhs() { return new int[] {
    120,
      0,   120,     1,     0,   121,     0,   123,     0,   222,     0,
      0,   122,     0,   121,   122,     0,   155,     0,   157,     0,
@@ -1425,14 +1415,10 @@ private static final int[] yyrhsTableCreator() {
      0,    29,     0,    39,     0,    34,     0,    38,     0,    33,
      0,    30,     0,    40,     0,    37,     0,   218,     0
 
-  };
-  return yyrhs;
-}
+}; }
 
-public static final int yyrline[] = yyrlineTableCreator();
-
-private static final int[] yyrlineTableCreator() {
-  final int yyrline[] = {
+static public final int yyrline[] = create$yyrline();
+private static int[] create$yyrline() { return new int[] {
  0,
    220,   221,   225,   226,   227,   228,   233,   234,   239,   240,
    244,   245,   249,   250,   256,   257,   258,   259,   260,   261,
@@ -1460,59 +1446,10 @@ private static final int[] yyrlineTableCreator() {
    766,   767,   768,   769,   770,   771,   772,   773,   774,   775,
    779
 
-  };
-  return yyrline;
-}
+}; }
 
-public static final String yytname[] = yytnameTableCreator();
-
-private static final String[] yytnameTableCreator() {
-  final String yytname[] = {
-   "$","error","$undefined.","LEX_ERROR",
-"EPSILON","INTEGER_LITERAL","LONG_LITERAL","FLOAT_LITERAL","DOUBLE_LITERAL",
-"BOOLEAN_LITERAL","STRING_LITERAL","CHARACTER_LITERAL","NULL_LITERAL","IDENTIFIER",
-"ABSTRACT","ANDAND","BOOLEAN","BREAK","BYTE","CASE","CATCH","CHAR","CLASS","CONST",
-"CONTINUE","DEFAULT","DO","DOUBLE","ELSE","EQADD","EQAND","EQDIV","EQEQ","EQLOGRSHIFT",
-"EQLSHIFT","EQMOD","EQMUL","EQOR","EQRSHIFT","EQSUB","EQXOR","EXTENDS","FINAL",
-"FINALLY","FLOAT","FOR","GE","GOTO","IF","IMPLEMENTS","IMPORT","INSTANCEOF",
-"INT","INTERFACE","LE","LOGRSHIFT","LONG","LSHIFT","MINUSMINUS","NATIVE","NE",
-"NEW","OROR","PACKAGE","PLUSPLUS","PRIVATE","PROTECTED","PUBLIC","RETURN","RSHIFT",
-"SHORT","STATIC","SUPER","SWITCH","SYNCHRONIZED","STRICTFP","THIS","THROW","THROWS",
-"TRANSIENT","TRY","VOID","VOLATILE","WHILE","NH_EXPRESSION","NH_STRING","NH_UNICODE_STRING",
-"NH_ARRAY_PTR","NATIVE_STATEMENTS","NATIVE_STATEMENTS_WITH_JAVA_TAIL","NATIVE_BLOCK",
-"NATIVE_EXPRESSION","NATIVE_STRING","NATIVE_UNICODE_STRING","'.'","','","'='",
-"'{'","'}'","'`'","';'","'('","')'","'['","']'","'+'","'-'","'&'","'~'","'!'",
-"'*'","'/'","'%'","'<'","'>'","'^'","'|'","'?'","':'","Outer","Goal","NonBlockStatements",
-"NonBlockStatement","EnclosedStatements","EnclosedStatement","Literal","Type",
-"PrimitiveType","ReferenceType","ClassOrInterfaceType","ClassType","ArrayType",
-"Name","SimpleName","Modifiers","Modifier","VariableDeclarators","VariableDeclarator",
-"VariableDeclaratorId","VariableInitializer","FormalParameter","ArrayInitializer",
-"VariableInitializers","JavaBlock","@1","BlockStatements_opt","EmbeddedNativeBlock",
-"EnclosingNativeBlock","@2","Block","BlockStatements","BlockStatement","EmbeddedNativeStatements",
-"NativeStatementsBegin","NativeCodeEnd","LocalVariableDeclarationStatement",
-"LocalVariableDeclaration","Statement","EmptyStatement","ExpressionStatement",
-"ThrowStatement","SynchronizedStatement","EnclosedSynchronizedStatement","TryStatement",
-"EnclosedTryStatement","Catches","CatchClause","EnclosedCatches","EnclosedCatchClause",
-"CatchClauseHead","@3","@4","Finally","EnclosedFinally","ReturnStatement","Primary",
-"BracedExpression","PrimaryNoNewArray","NativeExpression","@5","@6","NativeString",
-"@7","@8","@9","@10","ClassLiteral","ClassInstanceCreationExpression","ArgumentList",
-"Arguments","ArrayCreationExpression","DimExprs","DimExpr","Dims","Super","FieldAccess",
-"MethodInvocation","MethodInvocationHeader","ArrayAccess","PostfixExpression",
-"PostIncrementExpression","PostDecrementExpression","UnaryExpression","PreIncrementExpression",
-"PreDecrementExpression","UnaryExpressionNotPlusMinus","CastExpression","MultiplicativeExpression",
-"AdditiveExpression","ShiftExpression","RelationalExpression","EqualityExpression",
-"AndExpression","ExclusiveOrExpression","InclusiveOrExpression","ConditionalAndExpression",
-"ConditionalOrExpression","ConditionalExpression","AssignmentExpression","Assignment",
-"LeftHandSide","AssignmentOperator","Expression", null
-
-  };
-  return yytname;
-}
-
-public static final int yyr1[] = yyr1TableCreator();
-
-private static final int[] yyr1TableCreator() {
-  final int yyr1[] = {
+static public final int yyr1[] = create$yyr1();
+private static int[] create$yyr1() { return new int[] {
      0,
    119,   119,   120,   120,   120,   120,   121,   121,   122,   122,
    123,   123,   124,   124,   125,   125,   125,   125,   125,   125,
@@ -1540,14 +1477,10 @@ private static final int[] yyr1TableCreator() {
    221,   221,   221,   221,   221,   221,   221,   221,   221,   221,
    222
 
-  };
-  return yyr1;
-}
+}; }
 
-public static final int yyr2[] = yyr2TableCreator();
-
-private static final int[] yyr2TableCreator() {
-  final int yyr2[] = {
+static public final int yyr2[] = create$yyr2();
+private static int[] create$yyr2() { return new int[] {
      0,
      1,     2,     1,     1,     1,     0,     1,     2,     1,     1,
      1,     2,     1,     1,     1,     1,     1,     1,     1,     1,
@@ -1575,14 +1508,10 @@ private static final int[] yyr2TableCreator() {
      1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
      1
 
-  };
-  return yyr2;
-}
+}; }
 
-public static final int yydefact[] = yydefactTableCreator();
-
-private static final int[] yydefactTableCreator() {
-  final int yydefact[] = {
+static public final int yydefact[] = create$yydefact();
+private static int[] create$yydefact() { return new int[] {
      6,
     15,    16,    17,    18,    19,    20,    21,    22,    41,    32,
     25,    29,    31,    44,    30,    27,    28,     0,     0,     0,
@@ -1622,14 +1551,10 @@ private static final int[] yydefactTableCreator() {
    109,   131,   134,   137,     0,    78,    57,    63,    56,     0,
      0,    77,    55,   110,     0,     0,     0
 
-  };
-  return yydefact;
-}
+}; }
 
-public static final int yydefgoto[] = yydefgotoTableCreator();
-
-private static final int[] yydefgotoTableCreator() {
-  final int yydefgoto[] = {
+static public final int yydefgoto[] = create$yydefgoto();
+private static int[] create$yydefgoto() { return new int[] {
    365,
     43,    44,   237,    46,    47,    48,    49,   106,    51,    52,
    114,   107,   108,    55,    56,    57,   147,   148,   149,   317,
@@ -1643,14 +1568,10 @@ private static final int[] yydefgotoTableCreator() {
     94,    95,    96,    97,    98,    99,   100,   101,   102,   103,
    104,   205,   145
 
-  };
-  return yydefgoto;
-}
+}; }
 
-public static final int yypact[] = yypactTableCreator();
-
-private static final int[] yypactTableCreator() {
-  final int yypact[] = {
+static public final int yypact[] = create$yypact();
+private static int[] create$yypact() { return new int[] {
    568,
 -32768,-32768,-32768,-32768,-32768,-32768,-32768,-32768,-32768,-32768,
 -32768,-32768,-32768,-32768,-32768,-32768,-32768,  1198,   371,  1198,
@@ -1690,14 +1611,10 @@ private static final int[] yypactTableCreator() {
 -32768,-32768,-32768,-32768,   154,-32768,-32768,-32768,-32768,    79,
    167,-32768,-32768,-32768,   270,   271,-32768
 
-  };
-  return yypact;
-}
+}; }
 
-public static final int yypgoto[] = yypgotoTableCreator();
-
-private static final int[] yypgotoTableCreator() {
-  final int yypgoto[] = {
+static public final int yypgoto[] = create$yypgoto();
+private static int[] create$yypgoto() { return new int[] {
 -32768,
 -32768,-32768,    28,-32768,   229,-32768,   -52,     1,    91,   255,
 -32768,     2,     0,  -140,   -56,   -51,   118,    34,  -325,  -266,
@@ -1711,14 +1628,10 @@ private static final int[] yypgotoTableCreator() {
     23,   103,    98,   105,   106,   100,-32768,   -37,    87,-32768,
 -32768,-32768,    59
 
-  };
-  return yypgoto;
-}
+}; }
 
-public static final int yytable[] = yytableTableCreator();
-
-private static final int[] yytableTableCreator() {
-  final int yytable[] = {
+static public final int yytable[] = create$yytable();
+private static int[] create$yytable() { return new int[] {
     54,
     50,    53,   127,   158,   162,    79,   121,   212,   298,   157,
    300,   216,   315,   255,   120,     9,    58,   258,   115,   112,
@@ -1863,14 +1776,10 @@ private static final int[] yytableTableCreator() {
      0,     0,     0,    37,     0,     0,     0,     0,     0,     0,
     41,    42
 
-  };
-  return yytable;
-}
+}; }
 
-public static final int yycheck[] = yycheckTableCreator();
-
-private static final int[] yycheckTableCreator() {
-  final int yycheck[] = {
+static public final int yycheck[] = create$yycheck();
+private static int[] create$yycheck() { return new int[] {
      0,
      0,     0,    28,    56,    56,     0,    24,   114,   223,    54,
    223,   121,   245,   154,   101,    13,     0,    13,    19,    19,
@@ -2015,9 +1924,7 @@ private static final int[] yycheckTableCreator() {
     -1,    -1,    -1,   101,    -1,    -1,    -1,    -1,    -1,    -1,
    108,   109
 
-  };
-  return yycheck;
-}
+}; }
 
 
 
@@ -2053,7 +1960,7 @@ public static void compileError(IJavaContext cxt, String msg, boolean errthrow)
     YYLocation lbeg = cxt.lbeg();
     InputBuffer ibuf = cxt.ibuf();
     String line = ibuf.getLine(lbeg);
-    
+
     System.err.println("Compile error: " + msg);
     System.err.println("At: " + lbeg);
     System.err.println(line);
@@ -2082,7 +1989,7 @@ public static void notSupported(IJavaContext cxt, String what) throws CompileExc
 IMutableContext cxt = new IMutableContext() {
 	public final YYLocation lbeg() { return EmbeddedParser.this.lbeg(); }
 	public final YYLocation lend() { return EmbeddedParser.this.lend(); }
-	public final InputBuffer ibuf() { return outer_cxt.ibuf(); }
+	public final JanetSourceReader ibuf() { return outer_cxt.ibuf(); }
 
 	public final void reportError(String msg) throws CompileException { pl.edu.agh.icsr.janet.Parser.reportError(this, msg); }
 
@@ -2099,7 +2006,7 @@ IMutableContext cxt = new IMutableContext() {
 ILocationContext tokencxt = new ILocationContext() {
 	public final YYLocation lbeg() { return yylex.tokenloc(); }
 	public final YYLocation lend() { return cxt.lend(); }
-	public final InputBuffer ibuf() { return cxt.ibuf(); }
+	public final JanetSourceReader ibuf() { return cxt.ibuf(); }
 	public final void reportError(String msg) throws CompileException {
 	    throw new UnsupportedOperationException();
 	}
@@ -2122,5 +2029,7 @@ int getInitialLexMode() { //int yymode) {
     return Lexer.JAVA_TOKEN;
 }
 
+
+static final String[] yytname = TokenTypes.yytname;
 
 }; /*class*/

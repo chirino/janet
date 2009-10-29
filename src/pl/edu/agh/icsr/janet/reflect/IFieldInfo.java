@@ -39,6 +39,6 @@ package pl.edu.agh.icsr.janet.reflect;
 import pl.edu.agh.icsr.janet.*;
 
 public interface IFieldInfo extends /*IVariableInfo, */IMemberInfo {
-    IClassInfo getType() throws CompileException;
+    IClassInfo getType() throws ParseException;
     String getName();
 }

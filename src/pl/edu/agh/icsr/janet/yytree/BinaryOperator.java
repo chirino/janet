@@ -78,7 +78,7 @@ public abstract class BinaryOperator {
         this.r = r;
     }
 
-    public abstract void resolve() throws CompileException;
+    public abstract void resolve() throws ParseException;
     public abstract int getID();
 
     public IClassInfo getLeftType() { return lt; }
@@ -123,7 +123,7 @@ public abstract class BinaryOperator {
     }
 
     private static void checkIntegralTypes(ClassManager classMgr, String symbol,
-        IClassInfo c1, IClassInfo c2) throws CompileException
+        IClassInfo c1, IClassInfo c2) throws ParseException
     {
         if (!c1.isAssignableFrom(classMgr.LONG) ||
             !c2.isAssignableFrom(classMgr.LONG))
@@ -265,7 +265,7 @@ public abstract class BinaryOperator {
         public XOr(IDetailedLocationContext cxt) {
             super(cxt);
         }
-        public void resolve() throws CompileException {
+        public void resolve() throws ParseException {
             IClassInfo ltype = l.getExpressionType();
             IClassInfo rtype = r.getExpressionType();
             int type = checkTypes(classMgr, ltype, rtype, getSymbol(), true, true, false);
@@ -282,7 +282,7 @@ public abstract class BinaryOperator {
         public LShift(IDetailedLocationContext cxt) {
             super(cxt);
         }
-        public void resolve() throws CompileException  {
+        public void resolve() throws ParseException  {
             IClassInfo ltype = l.getExpressionType();
             IClassInfo rtype = r.getExpressionType();
             checkIntegralTypes(classMgr, getSymbol(), ltype, rtype);
@@ -297,7 +297,7 @@ public abstract class BinaryOperator {
         public RShift(IDetailedLocationContext cxt) {
             super(cxt);
         }
-        public void resolve() throws CompileException  {
+        public void resolve() throws ParseException  {
             IClassInfo ltype = l.getExpressionType();
             IClassInfo rtype = r.getExpressionType();
             checkIntegralTypes(classMgr, getSymbol(), ltype, rtype);
@@ -312,7 +312,7 @@ public abstract class BinaryOperator {
         public LogRShift(IDetailedLocationContext cxt) {
             super(cxt);
         }
-        public void resolve() throws CompileException  {
+        public void resolve() throws ParseException  {
             IClassInfo ltype = l.getExpressionType();
             IClassInfo rtype = r.getExpressionType();
             checkIntegralTypes(classMgr, getSymbol(), ltype, rtype);

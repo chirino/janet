@@ -125,7 +125,7 @@ public class YYFieldAccessExpression extends YYExpression {
         this.targetType = TYPE;
     }
 
-    public void resolve(boolean isSubexpression) throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         if (unresolvedTargetName != null) {
             // JLS 6.5.5.2
             Object o = unresolvedTargetName.reclassify();

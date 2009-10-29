@@ -40,11 +40,11 @@ import pl.edu.agh.icsr.janet.*;
 import java.util.*;
 
 public interface IMethodInfo extends IMemberInfo {
-    public IClassInfo getReturnType() throws CompileException;
+    public IClassInfo getReturnType() throws ParseException;
     public boolean isConstructor();
-    public String getArgumentSignature() throws CompileException;
-    public String getJLSSignature() throws CompileException;
-    public String getJNISignature() throws CompileException;
-    public Map getExceptionTypes() throws CompileException;
-    public IClassInfo[] getParameterTypes() throws CompileException;
+    public String getArgumentSignature() throws ParseException;
+    public String getJLSSignature() throws ParseException;
+    public String getJNISignature() throws ParseException;
+    public Map getExceptionTypes() throws ParseException;
+    public IClassInfo[] getParameterTypes() throws ParseException;
 }

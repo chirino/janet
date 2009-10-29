@@ -53,7 +53,7 @@ public class YYPtrFetchExpression extends YYExpression {
         this.toNative = toNative;
     }
 
-    public void resolve(boolean isSubexpression) throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         if (isSubexpression) {
             reportError("The address fetch operator " +
                 (toNative ? "'#&'" : "'&'") +

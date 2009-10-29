@@ -154,7 +154,7 @@ public final class ClassInfoReflected implements IClassInfo {
             if (this == classMgr.String) return "jstring";
             if (this.isAssignableFrom(classMgr.Throwable)) return "jthrowable";
             return "jobject";
-        } catch (CompileException e) {
+        } catch (ParseException e) {
             throw new IllegalStateException();
         }
     }
@@ -218,12 +218,12 @@ public final class ClassInfoReflected implements IClassInfo {
         return dclfields;
     }
 
-    public SortedMap getAccessibleFields() throws CompileException {
+    public SortedMap getAccessibleFields() throws ParseException {
         if (accfields != null) return accfields;
         return accfields = classMgr.getAccessibleFields(this);
     }
 
-    public SortedMap getFields(String name) throws CompileException {
+    public SortedMap getFields(String name) throws ParseException {
         return classMgr.getFields(this, name);
     }
 
@@ -239,17 +239,17 @@ public final class ClassInfoReflected implements IClassInfo {
         return dclmethods;
     }
 
-    public SortedMap getAccessibleMethods() throws CompileException {
+    public SortedMap getAccessibleMethods() throws ParseException {
         if (accmethods != null) return accmethods;
         return accmethods = classMgr.getAccessibleMethods(this);
     }
 
-    public SortedMap getMethods(String name) throws CompileException {
+    public SortedMap getMethods(String name) throws ParseException {
         return classMgr.getMethods(this, name);
     }
 
     public SortedMap getMethods(String name, String jlssignature)
-            throws CompileException {
+            throws ParseException {
         return classMgr.getMethods(this, name, jlssignature);
     }
 
@@ -264,7 +264,7 @@ public final class ClassInfoReflected implements IClassInfo {
         return interfaces;
     }
 
-    public Map getConstructors() throws CompileException {
+    public Map getConstructors() throws ParseException {
         if (constructors != null) return constructors;
         constructors = new HashMap();
         Constructor[] cstrs = cls.getDeclaredConstructors();
@@ -318,8 +318,7 @@ public final class ClassInfoReflected implements IClassInfo {
 //        { false, true,  true,  true,  true,  true,  true,  true  }  // double
 //    };
 
-    public boolean isAssignableFrom(IClassInfo clsFrom)
-            throws CompileException {
+    public boolean isAssignableFrom(IClassInfo clsFrom) throws ParseException {
         if (this.cls.isPrimitive()) {
             if (!clsFrom.isPrimitive()) return false;
             return prWidCnvTable[getPrIdx(this)][getPrIdx(clsFrom)];
@@ -331,7 +330,7 @@ public final class ClassInfoReflected implements IClassInfo {
         }
     }
 
-    public int isCastableTo(IClassInfo clsTo) throws CompileException {
+    public int isCastableTo(IClassInfo clsTo) throws ParseException {
         if (isAssignableFrom(clsTo)) {
             return CAST_CORRECT;
         }
@@ -358,7 +357,7 @@ public final class ClassInfoReflected implements IClassInfo {
      * interface
      * JLS 8.4.4
      */
-    public boolean isSubclassOf(IClassInfo cls) throws CompileException {
+    public boolean isSubclassOf(IClassInfo cls) throws ParseException {
         return !isInterface() && !cls.isInterface() && isAssignableFrom(cls);
     }
 

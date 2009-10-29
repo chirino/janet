@@ -42,7 +42,7 @@ import pl.edu.agh.icsr.janet.yytree.*;
 
 class Lexer extends pl.edu.agh.icsr.janet.natives.Lexer {
 
-    public Lexer(InputBuffer ibuf, EmbeddedParser jeparser) {
+    public Lexer(JanetSourceReader ibuf, EmbeddedParser jeparser) {
         super(ibuf, jeparser);
     }
 
@@ -51,11 +51,11 @@ class Lexer extends pl.edu.agh.icsr.janet.natives.Lexer {
      */
 
     public final static boolean isInputCharacter(final int c) {
-	return (c != InputBuffer.EOF && c != '\n' && c != '\r');
+        return (c != JanetSourceReader.EOF && c != '\n' && c != '\r');
     }
 
     public final static boolean isWhitespace(final int c) {
-	return (c == ' ' || c == '\t' || c == '\f' || c == '\n' || c == '\r');
+        return (c == ' ' || c == '\t' || c == '\f' || c == '\n' || c == '\r');
     }
 
     public final static boolean isBrace(final int c) {
@@ -79,9 +79,9 @@ class Lexer extends pl.edu.agh.icsr.janet.natives.Lexer {
      * Report error
      */
     public void lexError(final String msg) throws LexException {
-	token.clear();
-	token.setTokenType(TokenTypes.LEX_ERROR);
-	throw new LexException(msg);
+        token.clear();
+        token.setTokenType(TokenTypes.LEX_ERROR);
+        throw new LexException(msg);
     }
 
     /***************************************************************************
@@ -89,43 +89,43 @@ class Lexer extends pl.edu.agh.icsr.janet.natives.Lexer {
      */
 
     void collectEOF() {
-	token.setTokenType(TokenTypes.YYEOF);
+        token.setTokenType(TokenTypes.YYEOF);
     }
 
     void collectWhitespace() {
-	; // just skip it
+        ; // just skip it
     }
 
     void collectComment(final int ch0) throws IOException, LexException {
-	int ch;
-	if (ch0 == '/') {
-	    while (isInputCharacter(ch = nextChar()));
-	    if (ch != InputBuffer.EOF) { // must be line terminator
-		return;
-	    }
-	    return;
-	}
+        int ch;
+        if (ch0 == '/') {
+            while (isInputCharacter(ch = nextChar()));
+            if (ch != JanetSourceReader.EOF) { // must be line terminator
+                return;
+            }
+            return;
+        }
 
-	// must be a multiline comment
-	while (true) {
-	    ch = nextChar();
-	    switch (ch) {
-	    case InputBuffer.EOF:
-		lexError("unterminated comment");
+        // must be a multiline comment
+        while (true) {
+            ch = nextChar();
+            switch (ch) {
+            case JanetSourceReader.EOF:
+                lexError("unterminated comment");
 
-	    case '*':
-		ch = nextChar();
-		if (ch == '/') {
-		    return;
-		} else {
-		    backupChar();
-		}
-		break;
+            case '*':
+                ch = nextChar();
+                if (ch == '/') {
+                    return;
+                } else {
+                    backupChar();
+                }
+                break;
 
-	    default: // absorb
-		break;
-	    }
-	}
+            default: // absorb
+                break;
+            }
+        }
     }
 
     void collectText(final int ch0, int lexmode)
@@ -180,9 +180,9 @@ class Lexer extends pl.edu.agh.icsr.janet.natives.Lexer {
 
     public int yylex(IMutableContext cxt, int lexmode)
             throws LexException, ParseException {
-	int ch;
-	try {
-	    token.clear();
+        int ch;
+        try {
+            token.clear();
             skipWhites();
 
             for(;;) {
@@ -191,7 +191,7 @@ class Lexer extends pl.edu.agh.icsr.janet.natives.Lexer {
                 case NATIVE_EXPRESSION:
                 case NATIVE_STATEMENTS:
                     ch = nextChar();
-                    if (ch == InputBuffer.EOF) {
+                    if (ch == JanetSourceReader.EOF) {
                         collectEOF();
                     } else if (isBrace(ch)) {
                         collectBrace(ch);

@@ -56,8 +56,7 @@ public class YYThis extends YYExpression { // JLS 15.7.2, 15.10.2
 
     public boolean isSuper() { return reftype == SUPER; }
 
-    public void resolve(boolean isSubexpression)
-            throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         YYClass cls = getCurrentClass();
         int memberType = getCurrentMember().getScopeType();
         if ((memberType & ~IScope.INSTANCE_CONTEXT) != 0) {

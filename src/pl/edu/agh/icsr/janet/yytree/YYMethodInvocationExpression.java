@@ -118,8 +118,7 @@ public class YYMethodInvocationExpression extends YYExpression {
         return this;
     }
 
-    public void resolve(boolean isSubexpresssion)
-            throws CompileException {
+    public void resolve(boolean isSubexpresssion) throws ParseException {
         if (unresolvedTargetName != null) {
             // JLS 6.5.6.2, JLS 15.11
             Object o = unresolvedTargetName.reclassify();

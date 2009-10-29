@@ -46,7 +46,7 @@ class Preprocessor {
 
     boolean uesc_start = false;
 
-    InputBuffer ibuf;
+    JanetSourceReader ibuf;
 
     YYLocation loc; // shared
     YYLocation loc_bkup = new YYLocation();
@@ -57,12 +57,12 @@ class Preprocessor {
     class UnicodeEscapeException extends PreprocessorException {
     }
 
-    public Preprocessor(InputBuffer ibuf) {
+    public Preprocessor(JanetSourceReader ibuf) {
 	this.ibuf = ibuf;
 	this.loc = ibuf.loc(); // shared location
     }
 
-    public final InputBuffer ibuf() {
+    public final JanetSourceReader ibuf() {
         return ibuf;
     }
 

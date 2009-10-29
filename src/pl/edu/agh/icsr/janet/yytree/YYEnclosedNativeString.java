@@ -56,8 +56,7 @@ public class YYEnclosedNativeString extends YYExpression {
         this.ncode = ncode;
     }
 
-    public void resolve(boolean isSubexpression)
-            throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         expressionType = classMgr.String;
         ncode.resolve();
         addExceptions(ncode.getExceptionsThrown());

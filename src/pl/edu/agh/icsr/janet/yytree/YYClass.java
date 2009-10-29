@@ -117,6 +117,7 @@ public class YYClass extends YYNode implements IClassInfo, IScope {
 //    boolean valid;
 
     private boolean hasNativeMethodImpls = false;
+    private String libName;
 
     public YYClass(IJavaContext cxt, String name, int type, YYModifierList m)
            throws CompileException {
@@ -270,7 +271,7 @@ public class YYClass extends YYNode implements IClassInfo, IScope {
         hasNativeMethodImpls = true;
     }
 
-    private void resolveMethodsAndConstructors() throws CompileException {
+    private void resolveMethodsAndConstructors() throws ParseException {
         dclmethods = new TreeMap();
         constructors = new HashMap();
         for (Iterator i = unresolvedMethods.iterator(); i.hasNext();) {
@@ -387,7 +388,7 @@ public class YYClass extends YYNode implements IClassInfo, IScope {
         try {
             if (this.isAssignableFrom(classMgr.Throwable)) return "jthrowable";
             return "jobject";
-        } catch (CompileException e) {
+        } catch (ParseException e) {
             throw new IllegalStateException();
         }
     }
@@ -407,8 +408,7 @@ public class YYClass extends YYNode implements IClassInfo, IScope {
         return enclosing.getCurrentClass();
     }
 
-
-    public IClassInfo getSuperclass() throws CompileException {
+    public IClassInfo getSuperclass() throws ParseException {
         if (isInterface()) {
             throw new UnsupportedOperationException();
         }
@@ -470,41 +470,41 @@ public class YYClass extends YYNode implements IClassInfo, IScope {
     /**
      * Enforces deep fields resolving
      */
-    public SortedMap getAccessibleFields() throws CompileException {
+    public SortedMap getAccessibleFields() throws ParseException {
         if (accfields != null) return accfields;
         lock();
         return accfields = classMgr.getAccessibleFields(this);
     }
 
-    public SortedMap getFields(String name) throws CompileException {
+    public SortedMap getFields(String name) throws ParseException {
         return classMgr.getFields(this, name);
     }
 
     /**
      * Enforces method resolving
      */
-    public SortedMap getDeclaredMethods() throws CompileException {
+    public SortedMap getDeclaredMethods() throws ParseException {
         if (dclmethods != null) return dclmethods;
         lock();
         resolveMethodsAndConstructors();
         return dclmethods;
     }
 
-    public SortedMap getAccessibleMethods() throws CompileException {
+    public SortedMap getAccessibleMethods() throws ParseException {
         if (accmethods != null) return accmethods;
         return accmethods = classMgr.getAccessibleMethods(this);
     }
 
-    public SortedMap getMethods(String name) throws CompileException {
+    public SortedMap getMethods(String name) throws ParseException {
         return classMgr.getMethods(this, name);
     }
 
     public SortedMap getMethods(String name, String jlssignature)
-            throws CompileException {
+            throws ParseException {
         return classMgr.getMethods(this, name, jlssignature);
     }
 
-    public Map getConstructors() throws CompileException {
+    public Map getConstructors() throws ParseException {
         if (constructors != null) return constructors;
         lock();
         resolveMethodsAndConstructors();
@@ -514,7 +514,7 @@ public class YYClass extends YYNode implements IClassInfo, IScope {
     /**
      * Enforces interfaces resolving
      */
-    public Map getInterfaces() throws CompileException {
+    public Map getInterfaces() throws ParseException {
         if (interfaces != null) return interfaces;
         lock();
         interfaces = new HashMap();
@@ -533,7 +533,7 @@ public class YYClass extends YYNode implements IClassInfo, IScope {
         return interfaces;
     }
 
-    public boolean isAssignableFrom(IClassInfo cls) throws CompileException { // JLS 5.1.4
+    public boolean isAssignableFrom(IClassInfo cls) throws ParseException { // JLS 5.1.4
         if (assignableClasses == null) {
             lock();
             assignableClasses = classMgr.getAssignableClasses(this);
@@ -541,7 +541,7 @@ public class YYClass extends YYNode implements IClassInfo, IScope {
         return assignableClasses.containsKey(cls.getFullName());
     }
 
-    public int isCastableTo(IClassInfo clsTo) throws CompileException {
+    public int isCastableTo(IClassInfo clsTo) throws ParseException {
         if (isAssignableFrom(clsTo)) {
             return CAST_CORRECT;
         }
@@ -555,7 +555,7 @@ public class YYClass extends YYNode implements IClassInfo, IScope {
      * interface
      * JLS 8.4.4
      */
-    public boolean isSubclassOf(IClassInfo cls) throws CompileException {
+    public boolean isSubclassOf(IClassInfo cls) throws ParseException {
         return !isInterface() && !cls.isInterface() && isAssignableFrom(cls);
     }
 
@@ -600,7 +600,7 @@ public class YYClass extends YYNode implements IClassInfo, IScope {
     }
 
     // todo: check for duplicate method definitions
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         // self-reference always first on the list
         addReferencedClass(this);
         super.resolve();
@@ -619,7 +619,7 @@ public class YYClass extends YYNode implements IClassInfo, IScope {
     }
 
     public Integer addReferencedMethod(int classidx, IMethodInfo mth)
-            throws CompileException {
+            throws ParseException {
         String key = ClassManager.getMethodKey(mth);
         Integer old = (Integer)referencedMethodsIdx.get(key);
         if (old != null) {
@@ -672,14 +672,19 @@ public class YYClass extends YYNode implements IClassInfo, IScope {
         return pos;
     }
 
-    String getLibName() {
+    public String getLibName() {
+        if (libName != null) return libName;
         try {
             String name = getPackageName();
             if (name.equals("")) name = getSimpleName();
-            return classMgr.mangle(name);
+            return (libName = classMgr.mangle(name));
         } catch (CompileException e) {
             throw new RuntimeException();
         }
+    }
+
+    public void setLibName(String libName) {
+        this.libName = libName;
     }
 
     public void write(Writer w) throws java.io.IOException {
@@ -739,7 +744,7 @@ public class YYClass extends YYNode implements IClassInfo, IScope {
                this.getFullName();
     }
 
-    public String describe() throws CompileException {
+    public String describe() throws ParseException {
         String s = YYModifierList.toString(modifiers) + this.toString();
         Iterator i;
         if (!isInterface()) s += " extends " + getSuperclass();

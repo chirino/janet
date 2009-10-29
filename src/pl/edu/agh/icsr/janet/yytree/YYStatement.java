@@ -144,7 +144,7 @@ public class YYStatement extends YYNode implements IScope {
         return exceptions;
     }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         boolean shared = false;
         for(Iterator i = iterator(); i.hasNext();) {
             YYStatement s = (YYStatement)i.next();
@@ -154,7 +154,7 @@ public class YYStatement extends YYNode implements IScope {
         if (exceptions == null) exceptions = new HashMap();
     }
 
-    public final void addExceptions(Map excs) throws CompileException {
+    public final void addExceptions(Map excs) throws ParseException {
         if (exceptions == null || exceptions.isEmpty()) {
             exceptions = excs;
             exceptionsShared = true;
@@ -166,7 +166,7 @@ public class YYStatement extends YYNode implements IScope {
         }
     }
 
-    public final void addException(IClassInfo e) throws CompileException {
+    public final void addException(IClassInfo e) throws ParseException {
         if (exceptions == null) {
             exceptions = new HashMap();
             exceptions.put(e, this);
@@ -219,7 +219,7 @@ public class YYStatement extends YYNode implements IScope {
         if (impl != null) {
             try {
                 return impl.addReferencedMethod(clsidx, mth);
-            } catch (CompileException e) {
+            } catch (ParseException e) {
                 throw new RuntimeException();
             }
         } else {

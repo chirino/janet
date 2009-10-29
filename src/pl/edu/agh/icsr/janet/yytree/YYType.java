@@ -109,7 +109,7 @@ public class YYType extends YYNode /*implements IClassInfo*/ {
      * Determine meaning of a type (JLS 6.5.4)
      * Inner classes NOT yet supported
      */
-    private IClassInfo resolveNoDims() throws CompileException {
+    private IClassInfo resolveNoDims() throws ParseException {
         IClassInfo result;
         String refpkgname = this.pkg == null ? "" : pkg.toString();
         String curpkgname = compUnit.getPackageName();
@@ -175,7 +175,7 @@ public class YYType extends YYNode /*implements IClassInfo*/ {
         IClassInfo t = (imports != null) ? imports.findSingle(name) : null;
 
     }*/
-    public IClassInfo getResolvedType() throws CompileException {
+    public IClassInfo getResolvedType() throws ParseException {
         if (refersTo != null) return refersTo;
         lock();
         String refpkgname = pkg == null ? "" : pkg.toString();

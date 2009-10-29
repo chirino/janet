@@ -51,7 +51,7 @@ public class YYFinally extends YYStatement {
 
     public YYStatement getBody() { return body; }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         body.resolve();
         addExceptions(body.getExceptionsThrown());
     }

@@ -94,7 +94,7 @@ public class YYNativeMethodImplementation extends YYStatement {
 
     public INativeMethodInfo getNativeMethodHeader() { return mth; }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         this.clsidxs = new HashSet();
         this.fldidxs = new HashSet();
         this.mthidxs = new HashSet();
@@ -125,7 +125,8 @@ public class YYNativeMethodImplementation extends YYStatement {
     }
 
     public int addReferencedMethod(int clsidx, IMethodInfo m)
-            throws CompileException {
+        throws ParseException
+    {
         Integer ret = declCls.addReferencedMethod(clsidx, m);
         mthidxs.add(ret);
         return ret.intValue();

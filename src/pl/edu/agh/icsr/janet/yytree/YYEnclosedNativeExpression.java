@@ -50,7 +50,7 @@ public class YYEnclosedNativeExpression extends YYExpression {
 
     public boolean isFinal() { return true; }
 
-    public void resolve(boolean isSubexpression) throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         ncode.resolve();
         addExceptions(ncode.getExceptionsThrown());
         expressionType = classMgr.NATIVETYPE;

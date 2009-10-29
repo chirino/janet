@@ -54,7 +54,7 @@ public class YYSynchronizedStatement extends YYStatement {
         this.statement = s;
     }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         ClassManager classMgr = getCurrentClass().getClassManager();
         expression.resolve();
         statement.resolve();

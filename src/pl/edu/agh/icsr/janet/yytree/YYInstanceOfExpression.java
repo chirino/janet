@@ -58,7 +58,7 @@ public class YYInstanceOfExpression extends YYExpression {
         this.target = target;
     }
 
-    public void resolve(boolean isSubexpression) throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         target.resolve(true);
         IClassInfo tt = target.getExpressionType();
         if (!tt.isReference() && tt != classMgr.NULL) {

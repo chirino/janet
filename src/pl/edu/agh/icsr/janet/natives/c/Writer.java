@@ -154,10 +154,12 @@ public class Writer implements IWriter {
                 fileWriter = null;
             }
             this.currCls = cls;
-            String filename = ClassManager.mangle(settings.getQnames() ?
-                cls.getFullName() : cls.getSimpleName()) + "Impl.c";
+            String filename = ClassManager.mangle(
+                //settings.getQnames() ? cls.getFullName() : cls.getSimpleName())
+                cls.getSimpleName()) + "Impl.c";
+            File dir = pl.edu.agh.icsr.janet.Writer.getOutDirForInput(cls.ibuf(), settings);
 
-            currOut = new File(settings.getTargetDirectory(), filename);
+            currOut = new File(dir, filename);
             fileWriter = new BufferedWriter(new FileWriter(currOut));
             subst.setSubst("CIMPLFILENAME", filename);
             fileWriter.write(Janet.getGeneratedCodeLicense());
@@ -230,7 +232,7 @@ public class Writer implements IWriter {
 
             fileWriter.flush();
 
-        } catch (CompileException e) {
+        } catch (ParseException e) {
             throw new RuntimeException();
         }
     }
@@ -326,7 +328,7 @@ public class Writer implements IWriter {
     private String getTypeSuffix() {
         try {
             return(currMth.getReturnType() == classMgr.VOID) ? "_V" : "_0";
-        } catch (CompileException e) { throw new RuntimeException(); }
+        } catch (ParseException e) { throw new RuntimeException(); }
     }
 
     private String getLocalSuffix(DeclarationTag dt) {
@@ -408,7 +410,7 @@ public class Writer implements IWriter {
                     } else {
                         write("(" + rtype.getJNIType() + ");");
                     }
-                } catch (CompileException e) { throw new RuntimeException(); }
+                } catch (ParseException e) { throw new RuntimeException(); }
             }
 
             // write variable declarations
@@ -640,7 +642,7 @@ public class Writer implements IWriter {
                         e.getMethod().getName() +
                         "(" + classMgr.getTypeNames(e.getMethod().getParameterTypes()) + ")" +
                         " on a null target reference\"),");
-                } catch (CompileException exc) { throw new RuntimeException(); }
+                } catch (ParseException exc) { throw new RuntimeException(); }
             }
 
             if (e.isStringLength()) {
@@ -1217,7 +1219,7 @@ public class Writer implements IWriter {
                 try {
                     var.tag = new VariableTag(var.getType(), "var", varname);
                     context.addVariable((VariableTag)var.tag);
-                } catch (CompileException exc) {
+                } catch (ParseException exc) {
                     throw new RuntimeException();
                 }
             }
@@ -1231,7 +1233,7 @@ public class Writer implements IWriter {
                 try {
                     var.tag = new VariableTag(var.getType(), infix, varname);
                     context.addVariable((VariableTag)var.tag);
-                } catch (CompileException exc) {
+                } catch (ParseException exc) {
                     throw new RuntimeException();
                 }
             }
@@ -1859,7 +1861,7 @@ public class Writer implements IWriter {
                     v.tag = vtag = new VariableTag(s.getCatchedExceptionType(),
                                                    "exc", ClassManager.mangle(v.getName()));
                     currentDclTag.addVariable(vtag);
-                } catch (CompileException e) {
+                } catch (ParseException e) {
                     throw new RuntimeException();
                 }
             }

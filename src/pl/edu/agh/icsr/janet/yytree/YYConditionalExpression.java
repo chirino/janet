@@ -56,8 +56,7 @@ public class YYConditionalExpression extends YYExpression {
         this.e2 = e2;
     }
 
-    public void resolve(boolean isSubexpression)
-            throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         e1.resolve(true);
         if (e1.getExpressionType().isAssignableFrom(classMgr.BOOLEAN)) {
             reportWrongType(e1.getExpressionType());

@@ -53,7 +53,7 @@ public class YYArrayAccessExpression extends YYExpression {
         this.dimexpr = dimexpr;
     }
 
-    public void resolve(boolean isSubexpression) throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         target.resolve(true);
         dimexpr.resolve(true);
 

@@ -36,71 +36,77 @@
 
 package pl.edu.agh.icsr.janet;
 
+import pl.edu.agh.icsr.janet.*;
 import java.io.*;
+import java.net.URL;
 
-public class InputBuffer {
+public class JanetSourceReader {
 
     public final static int EOF = -1;
 
-    File file;
     BufferedReader rdr;
     StringBuffer buffer;
+    File originFile;
+    URL originURL;
 
     YYLocation loc = new YYLocation(); // will be shared
     YYLocation loc_bkup = new YYLocation();
     boolean backed_up = false;
     boolean fully_read = false; // does buffer contain full input file
 
-    class InputBufferException extends LexException {
+    class JanetSourceReaderException extends LexException {
     }
 
-    InputBuffer(String filename, int initial_capacity, String encoding)
-            throws UnsupportedEncodingException, FileNotFoundException {
-        file = new File(filename);
-	rdr = new BufferedReader(new InputStreamReader(new FileInputStream(
-            file), encoding));
-	buffer = new StringBuffer(initial_capacity);
+    JanetSourceReader(URL originURL, File originFile, int initial_capacity,
+        String encoding)
+        throws UnsupportedEncodingException, IOException
+    {
+        InputStream is = originURL.openStream();
+        rdr = new BufferedReader(new InputStreamReader(is, encoding));
+        buffer = new StringBuffer(initial_capacity);
+        this.originFile = originFile;
+        this.originURL = originURL;
     }
 
     public int nextChar() throws IOException {
-	int c;
-	loc_bkup.copyFrom(loc);
-	if (loc.charno0 < buffer.length()) {
-	    c = buffer.charAt(loc.charno0);
-	} else {
+        int c;
+        loc_bkup.copyFrom(loc);
+        if (loc.charno0 < buffer.length()) {
+            c = buffer.charAt(loc.charno0);
+        } else {
             if (fully_read) {
                 c = -1;
             } else {
-	        c = rdr.read();
+                c = rdr.read();
             }
-	    if (c != -1) buffer.append((char)c);
-	}
-	loc.nextChar();
-	backed_up = false;
+            if (c != -1) buffer.append((char)c);
+        }
+        loc.nextChar();
+        backed_up = false;
 
-	if (c == '\r') {
-	    loc.nextLine();
-	} else if (c == '\n' &&
-		   (loc.charno0 <= 1 || buffer.charAt(loc.charno0-2) != '\r')) {
-	    loc.nextLine();
-	}
+        if (c == '\r') {
+            loc.nextLine();
+        } else if (c == '\n' &&
+                   (loc.charno0 <= 1 || buffer.charAt(loc.charno0-2) != '\r')) {
+            loc.nextLine();
+        }
         if (c == -1) {
             fully_read = true;
             rdr = null; // dispose reader
         }
-	return c; // maybe EOF
+        return c; // maybe EOF
     }
 
     public void backup() throws LexException {
-	if (backed_up) {
-	    throw new InputBufferException();
-	}
-	loc.copyFrom(loc_bkup);
-	backed_up = true;
+        if (backed_up) {
+            throw new JanetSourceReaderException();
+        }
+        loc.copyFrom(loc_bkup);
+        backed_up = true;
     }
 
     public YYLocation loc() {
-	return loc;
+        return loc;
     }
 
     protected void readLine() {
@@ -108,13 +114,13 @@ public class InputBuffer {
         int l = buffer.length();
         int c = (l == 0 ? ' ' : buffer.charAt(l-1));
         if (c != '\n' && c != '\r') {
-	    try {
-		while(true) {
+            try {
+                while(true) {
                     c = rdr.read();
-	            if (c != -1) buffer.append((char)c);
-		    if (c == -1 || c == '\n' || c == '\r') break;
-		}
-	    } catch (IOException e) {}
+                    if (c != -1) buffer.append((char)c);
+                    if (c == -1 || c == '\n' || c == '\r') break;
+                }
+            } catch (IOException e) {}
         }
     }
 
@@ -136,8 +142,15 @@ public class InputBuffer {
         return s;
     }
 
-    public String getFileName() { return file.getName(); }
-
     public StringBuffer getbuf() { return buffer; }
+
+    public File getOriginFile() { return originFile; }
+    public URL getOriginURL() { return originURL; }
+
+    public String getOriginAsString() {
+        return originFile != null
+            ? originFile.toString()
+            : originURL.toString();
+    }
 }
 

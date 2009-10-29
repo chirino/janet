@@ -72,25 +72,22 @@ public class NativeWriter {
 
     public void classWriteInit(YYClass cls) throws IOException {
         filename = ClassManager.mangle(
-            settings.getQnames() ? cls.getFullName() : cls.getSimpleName()) +
+            //settings.getQnames() ? cls.getFullName() : cls.getSimpleName()) +
+            cls.getSimpleName()) +
             ".c";
-        File cOutput = new File(settings.getTargetDirectory(), filename);
-        try {
-            fileWriter = new BufferedWriter(new FileWriter(cOutput));
-            subst.setSubst("__CFILENAME__", filename);
 
-            fileWriter.write(Janet.getGeneratedCodeLicense());
-            fileWriter.write(subst.substitute(janetHeader));
-            writeRefClasses(cls);
-            writeRefFields(cls);
-            writeRefMethods(cls);
-            writeRefStringLiterals(cls);
-            writeInitMethods(cls);
+        File dir = Writer.getOutDirForInput(cls.ibuf(), settings);
+        File cOutput = new File(dir, filename);
+        fileWriter = new BufferedWriter(new FileWriter(cOutput));
+        subst.setSubst("__CFILENAME__", filename);
 
-        } catch (IOException e) {
-            throw new IOException("can't write to file " + filename +
-                ": " + e.getMessage());
-        }
+        fileWriter.write(Janet.getGeneratedCodeLicense());
+        fileWriter.write(subst.substitute(janetHeader));
+        writeRefClasses(cls);
+        writeRefFields(cls);
+        writeRefMethods(cls);
+        writeRefStringLiterals(cls);
+        writeInitMethods(cls);
     }
 
     void writeRefClasses(YYClass cls) throws IOException {
@@ -126,7 +123,7 @@ public class NativeWriter {
                     (Modifier.isStatic(reffld.getModifiers()) ? "1" : "0") +
                     ", \"" + reffld.getName() + "\"" +
                     ", \"" + reffld.getType().getSignature() + "\" },\n");
-            } catch (CompileException e) {
+            } catch (ParseException e) {
                 throw new RuntimeException();
             }
         }
@@ -152,7 +149,7 @@ public class NativeWriter {
                     (refmth.isConstructor() ? "<init>" : refmth.getName()) +
                     "\"" +
                     ", \"" + refmth.getJNISignature() + "\" },\n");
-            } catch (CompileException e) {
+            } catch (ParseException e) {
                 throw new RuntimeException();
             }
         }
@@ -285,7 +282,7 @@ public class NativeWriter {
                 write("    " + mth.getReturnType().getJNIType() + " " +
                     "_janet_result;\n\n");
             }
-        } catch (CompileException e) {
+        } catch (ParseException e) {
             throw new RuntimeException();
         }
 
@@ -318,7 +315,7 @@ public class NativeWriter {
                           " */\n"
                     : "\n");
             }
-        } catch (CompileException e) {
+        } catch (ParseException e) {
             throw new RuntimeException();
         }
 
@@ -336,7 +333,7 @@ public class NativeWriter {
                         rmth.getJNISignature() + " */\n"
                     : "\n");
             }
-        } catch (CompileException e) {
+        } catch (ParseException e) {
             throw new RuntimeException();
         }
 
@@ -374,7 +371,7 @@ public class NativeWriter {
             if (mth.getReturnType() != classMgr.VOID) {
                 write("    return _janet_result;\n");
             }
-        } catch (CompileException e) {
+        } catch (ParseException e) {
             throw new RuntimeException();
         }
 
@@ -414,7 +411,7 @@ public class NativeWriter {
                     (mth.getModifiers() & Modifier.STATIC) != 0,
                      mth.getReturnType(), mth.getName(),
                      isNativeMethodOverridden(mth), mth.getParameters());
-        } catch (CompileException e) {
+        } catch (ParseException e) {
             throw new RuntimeException();
         }
 
@@ -455,7 +452,7 @@ public class NativeWriter {
             }
             result += ")\n";
             return result;
-        } catch (CompileException e) {
+        } catch (ParseException e) {
             throw new IllegalStateException();
         }
     }
@@ -479,7 +476,7 @@ public class NativeWriter {
                 }
             }
             return false;
-        } catch (CompileException e) {
+        } catch (ParseException e) {
             throw new RuntimeException();
         }
     }
@@ -596,7 +593,7 @@ public class NativeWriter {
             s += (")");
             return s;
 
-        } catch (CompileException e) {
+        } catch (ParseException e) {
             throw new RuntimeException();
         }
     }

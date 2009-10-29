@@ -55,8 +55,7 @@ public class YYLocalVariableAccessExpression extends YYExpression {
         this.variable = var;
     }
 
-    public void resolve(boolean isSubexpression)
-            throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         expressionType = variable.getType();
         exceptions = new HashMap(); // no exceptions
 

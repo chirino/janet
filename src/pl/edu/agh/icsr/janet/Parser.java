@@ -6,6 +6,7 @@ package pl.edu.agh.icsr.janet;
 
 import java.util.*;
 import java.io.*;
+import java.net.URL;
 import jbf.Int_Stack;
 import jbf.Object_Stack;
 import jbf.YYlocation;
@@ -66,8 +67,8 @@ import pl.edu.agh.icsr.janet.natives.YYNativeCode;
 
 
 /* The template file is based on parser templates defined in JB and
- * (indirectly) bison, and is therefore subject to GPL license as shown 
- * below. The JANET MPL 1.1 license do not apply in this case. Note that 
+ * (indirectly) bison, and is therefore subject to GPL license as shown
+ * below. The JANET MPL 1.1 license do not apply in this case. Note that
  * the template file is not an integral part of JANET and does not affect
  * JANET licensing.
  */
@@ -130,10 +131,10 @@ public class Parser {
 
 // CONSTANTS
 
-public static final int YYFINAL = 640;
-public static final int YYFLAG = -32768;
-public static final int YYNTBASE = 118;
-public static final int YYLAST = 4189;
+static public final int YYFINAL = 640;
+static public final int YYFLAG = -32768;
+static public final int YYNTBASE = 118;
+static public final int YYLAST = 4189;
 
 
     protected int yyreturn; // see ACTIONS switch
@@ -168,6 +169,11 @@ public static final int YYLAST = 4189;
     protected YYLocationStack yyls;
 
     protected CompilationManager compMgr;
+
+    // if false, the output from this parsed file will not be written
+    // (used for sourcepath; when sources are parsed but not translated)
+    protected boolean doProcessThisFile;
+
     protected Lexer yylex;
     protected java.io.PrintWriter yyerr;
 
@@ -175,10 +181,10 @@ public static final int YYLAST = 4189;
 
 // PROCS
 
-static final int YYTRANSLATE(int x)
-	{ return ((x) <= 347 ? yytranslate[x] : 297);}
+final int YYTRANSLATE(int x)
+	{ return ((x) <= 348 ? yytranslate[x] : 297);}
 
-    
+
     // default constructor for newInstance()
     public Parser() {
 	yyss = new Int_Stack();
@@ -191,7 +197,7 @@ static final int YYTRANSLATE(int x)
 	yyerrthrow = false;
 	yylexexception = null;
     }
-    
+
     public Parser(Lexer yyl, java.io.PrintWriter ferr) {
 	this();
 	_init(yyl, ferr);
@@ -203,16 +209,18 @@ static final int YYTRANSLATE(int x)
 	loc = yylex.loc();
     }
 
-    public int yyparse(CompilationManager compMgr)
-            throws ParseException {
+    public int yyparse(CompilationManager compMgr, boolean doProcessThisFile)
+        throws ParseException
+    {
 	this.compMgr = compMgr;
+    this.doProcessThisFile = doProcessThisFile;
 	this.lexmode = Lexer.JAVA_TOKEN;
         yylbeg.copyFrom(loc);
 	yylend.copyFrom(loc);
 	int yyresult = _parse();
 	return yyresult;
     }
-	
+
     int _parse() throws ParseException {
 	int ok;
 	yychar1 = 0;  /* lookahead Token as an internal (translated) */
@@ -222,19 +230,19 @@ static final int YYTRANSLATE(int x)
 	yychar = YYEMPTY;  /* Cause a Token to be read.  */
 	yyval = null;
 	Goto = yynewstate;
-	
+
 	/* Initialize stack pointers.
 	   Waste one element of value and location stack
 	   so that they stay on the same level as the state stack.
 	   The wasted elements are never initialized.  */
-  
+
 	yyss.clear();
 	yyvs.clear();
 	yyls.clear();
-    
+
 	/* need to push a null value to match state 0 */
 	yyvs.push(null);
-  
+
 	if (yydebug > 0) yyprint("Starting parse\n");
 
 	/* Push a new state, which is found in	yystate	 .  */
@@ -252,7 +260,7 @@ static final int YYTRANSLATE(int x)
 		yyprint(yystate);
 		yyprint("\n");
 	    }
-	    
+
 	case yybackup:
 
 	    /* Do appropriate processing given the current state.  */
@@ -263,7 +271,7 @@ static final int YYTRANSLATE(int x)
 
 	    yyn = yypact[yystate];
 	    if (yyn == YYFLAG) {
-		Goto = yydefault; 
+		Goto = yydefault;
 		break branch;
 	    }
 
@@ -309,7 +317,7 @@ static final int YYTRANSLATE(int x)
 	    }
 
 	    yyn = yytable[yyn];
-	    
+
 	    /* yyn is what to do for this token type in this state.
 	       Negative => reduce, -yyn is rule number.
 	       Positive => shift, yyn is new state.
@@ -330,7 +338,7 @@ static final int YYTRANSLATE(int x)
 	    if (yyn == YYFINAL) return YYACCEPT;
 
 	    /* Shift the lookahead token.	 */
-	    
+
 	    if (yydebug > 0) {
 		yyprint("Shifting token ");
 		yyprint(yychar);
@@ -341,7 +349,7 @@ static final int YYTRANSLATE(int x)
 
 	    /* Discard the token being shifted unless it is eof.	*/
 	    if (yychar != YYEOF) yychar = YYEMPTY;
-	    
+
 	    yyvs.push(yylval);
 	    yylend.copyFrom(loc);
 	    yyls.push(yylex.tokenloc());
@@ -388,16 +396,18 @@ static final int YYTRANSLATE(int x)
 	    }
 
 	    /*$*/	/* the action file gets copied in in place of this dollarsign */
-	    
+
 	    /* Provide a way to avoid having return statements in the actions
 	       and so avoid "statement not reached" errors"
 	    */
 	    yyreturn = YYCONTINUE;
 
 	    switch (yyn) {
-		
+
 case 1:
-{ setNativeLanguage("c"); compUnit = new YYCompilationUnit(cxt, compMgr); pushScope(compUnit); ;
+{ setNativeLanguage("c");
+        compUnit = new YYCompilationUnit(cxt, compMgr, doProcessThisFile);
+        pushScope(compUnit); ;
     break;}
 case 2:
 { popScope(); yyval = compUnit.expand(cxt); ;
@@ -1184,16 +1194,16 @@ case 389:
     break;}
 }
 
-	    
+
 
 	    if(yyreturn == YYERROR) {
 		Goto = yyerrlab1; break branch;
 	    } else if(yyreturn != YYCONTINUE) return yyreturn;
-	    
+
 	    yyvs.popn(yylen);
 	    yyss.popn(yylen);
 	    /* yyls.popn(yylen); */
-	    
+
 	    yyvs.push(yyval);
 	    /*  yylsp++;*/
 	    if (yylen == 0) {
@@ -1201,30 +1211,30 @@ case 389:
 	    } else {
 		yyls.popn(yylen-1);
 	    }
-	    
+
 	    if (yydebug > 0) {
-		stackdump("state stack now"); 
+		stackdump("state stack now");
 		lstackdump("location stack now");
 	    }
-	    
+
 	    /* Now "shift" the result of the reduction.
 	       Determine what state that goes to,
 	       based on the state we popped back to
 	       and the rule number reduced by.  */
-	    
+
 	    yyn = yyr1[yyn];
-	    
+
 	    yystate = yypgoto[yyn - YYNTBASE] + yyss.peek();
 	    if (yystate >= 0 && yystate <= YYLAST && yycheck[yystate] == yyss.peek()) {
 		yystate = yytable[yystate];
 	    } else {
 		yystate = yydefgoto[yyn - YYNTBASE];
 	    }
-	    
+
 	    Goto = yynewstate; break branch;
-	    
+
 	case yyerrlab:	 /* here on detecting error */
-	    
+
 	    if (yyerrstatus == 0) {
 		/* If not already recovering from an error, report this error.  */
 		++yynerrs;
@@ -1232,9 +1242,9 @@ case 389:
 	    }
 
 	case yyerrlab1:	  /* here on error raised explicitly by an action */
-	    
+
 	    if (yyerrstatus == yyshiftcount) {
-		/* if just tried and failed to reuse lookahead token 
+		/* if just tried and failed to reuse lookahead token
 		   after an error, discard it.	*/
 		/* return failure if at end of input */
 		if (yychar == YYEOF) {
@@ -1255,9 +1265,9 @@ case 389:
 
 	    /* Else will try to reuse lookahead token
 	       after shifting the error token.  */
-	    
+
 	    yyerrstatus = yyshiftcount;	/* Each real token shifted decrements this */
-	    
+
 	    Goto = yyerrhandle; break branch;
 
 	case yyerrdefault:  /* state does notthing special for the error token. */
@@ -1273,18 +1283,18 @@ case 389:
 	    yystate = yyss.top();
 	    yyls.popn(1);
 
-	    if (yydebug > 0) { 
-		stackdump("Error: state stack now"); 
+	    if (yydebug > 0) {
+		stackdump("Error: state stack now");
 		lstackdump("Error: location stack now");
 	    }
-	    
+
 	case yyerrhandle:
 
 	    yyn = yypact[yystate];
 	    if (yyn == YYFLAG) {
 		Goto = yyerrdefault; break branch;
 	    }
-	    
+
 	    yyn += YYTERROR;
 	    if (yyn < 0 || yyn > YYLAST || yycheck[yyn] != YYTERROR) {
 		Goto = yyerrdefault; break branch;
@@ -1335,7 +1345,7 @@ case 389:
 	    int yychar1; // a TRANSLATEd char value
 	    int count;
 	    count = 0;
-	    
+
 	    /* Start yychar1 at -yyn if nec to avoid negative indexes in yycheck.*/
 	    for (yychar1 = (yyn < 0 ? -yyn : 0);
 		 (yyn+yychar1) < (yytname.length);
@@ -1388,11 +1398,11 @@ case 389:
 	    String line = yyline();
 	    if(line != null) {
 		if(cno >= line.length()) cno = line.length();
-		if(line.charAt(line.length()-1) == EOL) 
+		if(line.charAt(line.length()-1) == EOL)
 		    yyprint(line);
 		else
 		    yyprintln(line);
-		
+
 		// for(int i=0;i<cno;i++) yyprint(" ");
 		/* Modified by Dawid Kurzyniec, February 2000 */
 		for (int i=0; i<cno; i++) {
@@ -1402,7 +1412,7 @@ case 389:
 		    else
 			yyprint(" ");
 		}
-		
+
 		yyprintln("^");
 	    }
 	}
@@ -1444,7 +1454,7 @@ case 389:
 	}
 	yyprint("\n");
     }
-    
+
     protected void lstackdump(String s) {
 	int i;
 	int lsp1 = yyls.size();
@@ -1457,7 +1467,7 @@ case 389:
 		yyprint("  ");
 		yyprint("" + x);
 	    }
-	    yyprint("  <-->  " + yylend); 
+	    yyprint("  <-->  " + yylend);
 	}
 	yyprint("\n");
     }
@@ -1473,18 +1483,16 @@ case 389:
     public final pl.edu.agh.icsr.janet.YYLocation lbeg() { return yylbeg; }
     public final pl.edu.agh.icsr.janet.YYLocation lend() { return yylend; }
     public final pl.edu.agh.icsr.janet.YYLocation loc(int pos) { return yyls.tth(pos-yylen); }
-    
+
     protected void yyprint(Object x) { yyerr.print(x); yyerr.flush(); }
     protected void yyprintln(Object x) { yyerr.println(x); yyerr.flush(); }
     protected void yyprint(int x) { yyerr.print(x); yyerr.flush(); }
     protected void yyprintln(int x) { yyerr.println(x); yyerr.flush(); }
-    
+
 // TABLES
 
-public static final int yytranslate[] = yytranslateTableCreator();
-
-private static final int[] yytranslateTableCreator() {
-  final int yytranslate[] = {
+static public final int yytranslate[] = create$yytranslate();
+private static int[] create$yytranslate() { return new int[] {
      0,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -1511,25 +1519,21 @@ private static final int[] yytranslateTableCreator() {
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
      2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-     2,     2,     2,     2,     2,     1,     3,     4,     5,     6,
-     7,     8,     9,    10,    11,    12,    13,    14,    15,    16,
-    17,    18,    19,    20,    21,    22,    23,    24,    25,    26,
-    27,    28,    29,    30,    31,    32,    33,    34,    35,    36,
-    37,    38,    39,    40,    41,    42,    43,    44,    45,    46,
-    47,    48,    49,    50,    51,    52,    53,    54,    55,    56,
-    57,    58,    59,    60,    61,    62,    63,    64,    65,    66,
-    67,    68,    69,    70,    71,    72,    73,    74,    75,    76,
-    77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-    87,    88,    89,    90,    91,    92,    93
+     2,     2,     2,     2,     2,     1,     2,     3,     4,     5,
+     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,
+    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,
+    26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
+    36,    37,    38,    39,    40,    41,    42,    43,    44,    45,
+    46,    47,    48,    49,    50,    51,    52,    53,    54,    55,
+    56,    57,    58,    59,    60,    61,    62,    63,    64,    65,
+    66,    67,    68,    69,    70,    71,    72,    73,    74,    75,
+    76,    77,    78,    79,    80,    81,    82,    83,    84,    85,
+    86,    87,    88,    89,    90,    91,    92,    93
 
-  };
-  return yytranslate;
-}
+}; }
 
-public static final int yyprhs[] = yyprhsTableCreator();
-
-private static final int[] yyprhsTableCreator() {
-  final int yyprhs[] = {
+static public final int yyprhs[] = create$yyprhs();
+private static int[] create$yyprhs() { return new int[] {
      0,
      0,     1,     4,     6,     8,    10,    12,    14,    16,    18,
     20,    22,    24,    26,    28,    30,    32,    34,    36,    38,
@@ -1573,14 +1577,10 @@ private static final int[] yyprhsTableCreator() {
   1140,  1142,  1144,  1146,  1148,  1150,  1152,  1154,  1156,  1158,
   1160,  1162,  1164,  1166,  1168
 
-  };
-  return yyprhs;
-}
+}; }
 
-public static final int yyrhs[] = yyrhsTableCreator();
-
-private static final int[] yyrhsTableCreator() {
-  final int yyrhs[] = {
+static public final int yyrhs[] = create$yyrhs();
+private static int[] create$yyrhs() { return new int[] {
     -1,
    119,   131,     0,     5,     0,     6,     0,     7,     0,     8,
      0,     9,     0,    10,     0,    11,     0,    12,     0,    81,
@@ -1700,125 +1700,57 @@ private static final int[] yyrhsTableCreator() {
      0,    39,     0,    34,     0,    38,     0,    33,     0,    30,
      0,    40,     0,    37,     0,   291,     0,   295,     0
 
-  };
-  return yyrhs;
-}
+}; }
 
-public static final int yyrline[] = yyrlineTableCreator();
-
-private static final int[] yyrlineTableCreator() {
-  final int yyrline[] = {
+static public final int yyrline[] = create$yyrline();
+private static int[] create$yyrline() { return new int[] {
  0,
-   299,   301,   307,   308,   309,   310,   311,   312,   313,   314,
-   320,   324,   325,   326,   330,   331,   332,   333,   334,   335,
-   336,   337,   341,   342,   346,   350,   351,   355,   356,   367,
-   368,   376,   377,   381,   393,   394,   395,   397,   399,   401,
-   406,   407,   408,   409,   413,   417,   421,   440,   441,   442,
-   448,   449,   453,   454,   455,   456,   457,   458,   460,   461,
-   462,   463,   467,   468,   471,   472,   473,   483,   483,   487,
-   497,   498,   504,   505,   510,   511,   516,   517,   521,   522,
-   527,   528,   532,   533,   534,   535,   536,   540,   541,   542,
-   547,   548,   549,   550,   551,   557,   558,   562,   563,   567,
-   568,   572,   573,   577,   578,   584,   588,   589,   590,   591,
-   593,   594,   598,   600,   604,   605,   610,   611,   615,   616,
-   620,   621,   626,   627,   631,   632,   638,   642,   644,   646,
-   651,   653,   657,   658,   662,   663,   669,   675,   680,   682,
-   687,   689,   693,   695,   699,   700,   701,   702,   707,   708,
-   709,   715,   719,   720,   724,   725,   729,   730,   734,   735,
-   740,   741,   745,   746,   747,   748,   752,   756,   762,   763,
-   764,   765,   766,   770,   771,   777,   779,   783,   784,   789,
-   790,   794,   795,   796,   800,   804,   806,   811,   812,   813,
-   814,   815,   816,   820,   821,   822,   823,   824,   828,   829,
-   830,   831,   832,   833,   834,   835,   836,   837,   838,   840,
-   844,   848,   852,   856,   860,   861,   862,   863,   864,   865,
-   866,   870,   874,   878,   882,   886,   887,   888,   889,   894,
-   895,   899,   903,   904,   908,   909,   913,   917,   921,   925,
-   929,   934,   934,   946,   947,   948,   953,   954,   958,   959,
-   964,   965,   969,   970,   974,   975,   979,   980,   984,   988,
-   992,   993,   994,   998,   999,  1003,  1007,  1009,  1013,  1019,
-  1020,  1021,  1025,  1026,  1032,  1033,  1037,  1038,  1042,  1043,
-  1044,  1045,  1046,  1047,  1048,  1049,  1050,  1051,  1052,  1056,
-  1057,  1058,  1062,  1063,  1064,  1066,  1067,  1068,  1072,  1073,
-  1074,  1075,  1079,  1079,  1080,  1085,  1085,  1086,  1093,  1094,
-  1098,  1099,  1106,  1107,  1108,  1109,  1110,  1111,  1115,  1116,
-  1120,  1121,  1125,  1126,  1130,  1131,  1135,  1136,  1137,  1145,
-  1146,  1150,  1151,  1152,  1153,  1157,  1161,  1165,  1166,  1167,
-  1168,  1169,  1173,  1177,  1181,  1182,  1183,  1184,  1188,  1189,
-  1190,  1191,  1193,  1197,  1198,  1199,  1200,  1204,  1205,  1206,
-  1210,  1211,  1212,  1213,  1217,  1218,  1219,  1220,  1221,  1222,
-  1226,  1227,  1228,  1232,  1233,  1237,  1238,  1242,  1243,  1247,
-  1248,  1252,  1253,  1257,  1258,  1262,  1263,  1267,  1271,  1272,
-  1273,  1277,  1278,  1279,  1280,  1281,  1282,  1283,  1284,  1285,
-  1286,  1287,  1288,  1292,  1296
+   299,   303,   309,   310,   311,   312,   313,   314,   315,   316,
+   322,   326,   327,   328,   332,   333,   334,   335,   336,   337,
+   338,   339,   343,   344,   348,   352,   353,   357,   358,   369,
+   370,   378,   379,   383,   395,   396,   397,   399,   401,   403,
+   408,   409,   410,   411,   415,   419,   423,   442,   443,   444,
+   450,   451,   455,   456,   457,   458,   459,   460,   462,   463,
+   464,   465,   469,   470,   473,   474,   475,   485,   485,   489,
+   499,   500,   506,   507,   512,   513,   518,   519,   523,   524,
+   529,   530,   534,   535,   536,   537,   538,   542,   543,   544,
+   549,   550,   551,   552,   553,   559,   560,   564,   565,   569,
+   570,   574,   575,   579,   580,   586,   590,   591,   592,   593,
+   595,   596,   600,   602,   606,   607,   612,   613,   617,   618,
+   622,   623,   628,   629,   633,   634,   640,   644,   646,   648,
+   653,   655,   659,   660,   664,   665,   671,   677,   682,   684,
+   689,   691,   695,   697,   701,   702,   703,   704,   709,   710,
+   711,   717,   721,   722,   726,   727,   731,   732,   736,   737,
+   742,   743,   747,   748,   749,   750,   754,   758,   764,   765,
+   766,   767,   768,   772,   773,   779,   781,   785,   786,   791,
+   792,   796,   797,   798,   802,   806,   808,   813,   814,   815,
+   816,   817,   818,   822,   823,   824,   825,   826,   830,   831,
+   832,   833,   834,   835,   836,   837,   838,   839,   840,   842,
+   846,   850,   854,   858,   862,   863,   864,   865,   866,   867,
+   868,   872,   876,   880,   884,   888,   889,   890,   891,   896,
+   897,   901,   905,   906,   910,   911,   915,   919,   923,   927,
+   931,   936,   936,   948,   949,   950,   955,   956,   960,   961,
+   966,   967,   971,   972,   976,   977,   981,   982,   986,   990,
+   994,   995,   996,  1000,  1001,  1005,  1009,  1011,  1015,  1021,
+  1022,  1023,  1027,  1028,  1034,  1035,  1039,  1040,  1044,  1045,
+  1046,  1047,  1048,  1049,  1050,  1051,  1052,  1053,  1054,  1058,
+  1059,  1060,  1064,  1065,  1066,  1068,  1069,  1070,  1074,  1075,
+  1076,  1077,  1081,  1081,  1082,  1087,  1087,  1088,  1095,  1096,
+  1100,  1101,  1108,  1109,  1110,  1111,  1112,  1113,  1117,  1118,
+  1122,  1123,  1127,  1128,  1132,  1133,  1137,  1138,  1139,  1147,
+  1148,  1152,  1153,  1154,  1155,  1159,  1163,  1167,  1168,  1169,
+  1170,  1171,  1175,  1179,  1183,  1184,  1185,  1186,  1190,  1191,
+  1192,  1193,  1195,  1199,  1200,  1201,  1202,  1206,  1207,  1208,
+  1212,  1213,  1214,  1215,  1219,  1220,  1221,  1222,  1223,  1224,
+  1228,  1229,  1230,  1234,  1235,  1239,  1240,  1244,  1245,  1249,
+  1250,  1254,  1255,  1259,  1260,  1264,  1265,  1269,  1273,  1274,
+  1275,  1279,  1280,  1281,  1282,  1283,  1284,  1285,  1286,  1287,
+  1288,  1289,  1290,  1294,  1298
 
-  };
-  return yyrline;
-}
+}; }
 
-public static final String yytname[] = yytnameTableCreator();
-
-private static final String[] yytnameTableCreator() {
-  final String yytname[] = {
-   "$","error","$undefined.","LEX_ERROR",
-"EPSILON","INTEGER_LITERAL","LONG_LITERAL","FLOAT_LITERAL","DOUBLE_LITERAL",
-"BOOLEAN_LITERAL","STRING_LITERAL","CHARACTER_LITERAL","NULL_LITERAL","IDENTIFIER",
-"ABSTRACT","ANDAND","BOOLEAN","BREAK","BYTE","CASE","CATCH","CHAR","CLASS","CONST",
-"CONTINUE","DEFAULT","DO","DOUBLE","ELSE","EQADD","EQAND","EQDIV","EQEQ","EQLOGRSHIFT",
-"EQLSHIFT","EQMOD","EQMUL","EQOR","EQRSHIFT","EQSUB","EQXOR","EXTENDS","FINAL",
-"FINALLY","FLOAT","FOR","GE","GOTO","IF","IMPLEMENTS","IMPORT","INSTANCEOF",
-"INT","INTERFACE","LE","LOGRSHIFT","LONG","LSHIFT","MINUSMINUS","NATIVE","NE",
-"NEW","OROR","PACKAGE","PLUSPLUS","PRIVATE","PROTECTED","PUBLIC","RETURN","RSHIFT",
-"SHORT","STATIC","SUPER","SWITCH","SYNCHRONIZED","STRICTFP","THIS","THROW","THROWS",
-"TRANSIENT","TRY","VOID","VOLATILE","WHILE","NH_EXPRESSION","NH_STRING","NH_UNICODE_STRING",
-"NH_ARRAY_PTR","NATIVE_STATEMENTS","NATIVE_STATEMENTS_WITH_JAVA_TAIL","NATIVE_BLOCK",
-"NATIVE_EXPRESSION","NATIVE_STRING","NATIVE_UNICODE_STRING","'.'","';'","'*'",
-"','","'{'","'}'","'='","'('","')'","':'","'['","']'","'+'","'-'","'~'","'!'",
-"'/'","'%'","'<'","'>'","'&'","'^'","'|'","'?'","Goal","@1","Literal","Void",
-"Type","PrimitiveType","ReferenceType","ClassOrInterfaceType","ClassType","InterfaceType",
-"ArrayType","Name","SimpleName","CompilationUnit","@2","ImportDeclarations",
-"PackageDeclaration","SingleTypeImportDeclaration","TypeImportOnDemandDeclaration",
-"TypeDeclaration","Modifiers","Modifier","NativeModifier","ModifiersWithNative",
-"ClassDeclaration","@3","ClassHeader","ClassHeaderHead","Super","Interfaces",
-"InterfaceTypeList","ClassBody","ClassBodyDeclarations","ClassBodyDeclaration",
-"StaticNativeStatement","@4","@5","ClassMemberDeclaration","FieldDeclaration",
-"VariableDeclarators","VariableDeclarator","VariableDeclaratorId","VariableInitializer",
-"MethodDeclaration","MethodHeader","MethodDeclarator","@6","FormalParameterList_opt",
-"FormalParameterList","FormalParameter","Throws_opt","ClassTypeList","MethodBody",
-"NativeMethodDeclaration","NativeMethodHeader","NativeMethodDeclarator","@7",
-"NativeMethodBody","NativeStatement","@8","StaticInitializer","ConstructorDeclaration",
-"ConstructorHeader","ConstructorDeclarator","@9","ConstructorBody","@10","ConstructorBodyStatements",
-"ExplicitConstructorInvocation","InterfaceDeclaration","InterfaceHeader","InterfaceHeaderHead",
-"ExtendsInterfaces","InterfaceBody","InterfaceMemberDeclarations","InterfaceMemberDeclaration",
-"ConstantDeclaration","AbstractMethodDeclaration","ArrayInitializer","VariableInitializers",
-"Block","@11","BlockStatements_opt","BlockStatements","BlockStatement","LocalVariableDeclarationStatement",
-"LocalVariableDeclaration","Statement","StatementNoShortIf","StatementWithoutTrailingSubstatement",
-"EmptyStatement","LabeledStatement","LabeledStatementNoShortIf","ExpressionStatement",
-"StatementExpression","IfThenStatement","IfThenElseStatement","IfThenElseStatementNoShortIf",
-"SwitchStatement","SwitchBlock","SwitchBlockStatementGroups","SwitchBlockStatementGroup",
-"SwitchLabels","SwitchLabel","WhileStatement","WhileStatementNoShortIf","DoStatement",
-"ForStatement","ForStatementNoShortIf","ForHeader","@12","ForInit_opt","ForExpression_opt",
-"ForUpdate_opt","StatementExpressionList","BreakStatement","ContinueStatement",
-"ReturnStatement","ThrowStatement","SynchronizedStatement","TryStatement","Catches",
-"CatchClause","CatchClauseHead","@13","Finally","NativeBlock","@14","@15","NativeStatements_opt",
-"Primary","BracedExpression","PrimaryNoNewArray","NativeExpression","@16","@17",
-"NativeString","@18","@19","@20","@21","ClassLiteral","ClassInstanceCreationExpression",
-"@22","@23","ArgumentList","Arguments","ArrayCreationExpression","DimExprs",
-"DimExpr","Dims","FieldAccess","MethodInvocation","ArrayAccess","PostfixExpression",
-"PostIncrementExpression","PostDecrementExpression","UnaryExpression","PreIncrementExpression",
-"PreDecrementExpression","UnaryExpressionNotPlusMinus","CastExpression","MultiplicativeExpression",
-"AdditiveExpression","ShiftExpression","RelationalExpression","EqualityExpression",
-"AndExpression","ExclusiveOrExpression","InclusiveOrExpression","ConditionalAndExpression",
-"ConditionalOrExpression","ConditionalExpression","AssignmentExpression","Assignment",
-"LeftHandSide","AssignmentOperator","Expression","ConstantExpression", null
-
-  };
-  return yytname;
-}
-
-public static final int yyr1[] = yyr1TableCreator();
-
-private static final int[] yyr1TableCreator() {
-  final int yyr1[] = {
+static public final int yyr1[] = create$yyr1();
+private static int[] create$yyr1() { return new int[] {
      0,
    119,   118,   120,   120,   120,   120,   120,   120,   120,   120,
    121,   122,   122,   122,   123,   123,   123,   123,   123,   123,
@@ -1862,14 +1794,10 @@ private static final int[] yyr1TableCreator() {
    293,   294,   294,   294,   294,   294,   294,   294,   294,   294,
    294,   294,   294,   295,   296
 
-  };
-  return yyr1;
-}
+}; }
 
-public static final int yyr2[] = yyr2TableCreator();
-
-private static final int[] yyr2TableCreator() {
-  final int yyr2[] = {
+static public final int yyr2[] = create$yyr2();
+private static int[] create$yyr2() { return new int[] {
      0,
      0,     2,     1,     1,     1,     1,     1,     1,     1,     1,
      1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
@@ -1913,14 +1841,10 @@ private static final int[] yyr2TableCreator() {
      1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
      1,     1,     1,     1,     1
 
-  };
-  return yyr2;
-}
+}; }
 
-public static final int yydefact[] = yydefactTableCreator();
-
-private static final int[] yydefactTableCreator() {
-  final int yydefact[] = {
+static public final int yydefact[] = create$yydefact();
+private static int[] create$yydefact() { return new int[] {
      1,
     38,     0,     0,     2,     0,    37,    36,    41,    42,    34,
      0,    32,     0,    57,     0,    58,     0,    55,    54,    53,
@@ -1987,14 +1911,10 @@ private static final int[] yydefactTableCreator() {
    252,     0,   235,   226,     0,   292,   295,   298,     0,   151,
    250,   224,   268,   307,     0,   249,   243,     0,     0,     0
 
-  };
-  return yydefact;
-}
+}; }
 
-public static final int yydefgoto[] = yydefgotoTableCreator();
-
-private static final int[] yydefgotoTableCreator() {
-  final int yydefgoto[] = {
+static public final int yydefgoto[] = create$yydefgoto();
+private static int[] create$yydefgoto() { return new int[] {
    638,
      1,   211,    79,   212,   282,    82,    83,    64,    97,   283,
    331,    12,     4,     5,     6,     7,     8,     9,    27,   216,
@@ -2015,14 +1935,10 @@ private static final int[] yydefgotoTableCreator() {
    296,   297,   298,   299,   300,   301,   302,   303,   304,   305,
    306,   307,   308,   261,   262,   384,   310,   600
 
-  };
-  return yydefgoto;
-}
+}; }
 
-public static final int yypact[] = yypactTableCreator();
-
-private static final int[] yypactTableCreator() {
-  final int yypact[] = {
+static public final int yypact[] = create$yypact();
+private static int[] create$yypact() { return new int[] {
 -32768,
    198,    19,    19,   633,   633,    54,    54,-32768,-32768,-32768,
    174,-32768,   256,-32768,   118,-32768,   188,-32768,-32768,-32768,
@@ -2089,14 +2005,10 @@ private static final int[] yypactTableCreator() {
 -32768,  3677,-32768,-32768,   474,-32768,-32768,-32768,   279,-32768,
   3774,-32768,-32768,-32768,   477,   454,-32768,   568,   581,-32768
 
-  };
-  return yypact;
-}
+}; }
 
-public static final int yypgoto[] = yypgotoTableCreator();
-
-private static final int[] yypgotoTableCreator() {
-  final int yypgoto[] = {
+static public final int yypgoto[] = create$yypgoto();
+private static int[] create$yypgoto() { return new int[] {
 -32768,
 -32768,-32768,    53,   -30,   -31,   164,    59,  -149,   -28,    31,
     -2,   -33,-32768,-32768,   580,-32768,    30,    88,   591,    -1,
@@ -2117,14 +2029,10 @@ private static final int[] yypgotoTableCreator() {
 -32768,   -41,   -61,  -106,   -47,   217,   219,   210,   215,   218,
 -32768,    61,   265,   391,-32768,-32768,  -153,-32768
 
-  };
-  return yypgoto;
-}
+}; }
 
-public static final int yytable[] = yytableTableCreator();
-
-private static final int[] yytableTableCreator() {
-  final int yytable[] = {
+static public final int yytable[] = create$yytable();
+private static int[] create$yytable() { return new int[] {
     11,
     13,   449,    28,    28,   363,   222,    57,    48,    57,   403,
    454,   537,   334,   270,   337,   328,   177,   541,    10,   548,
@@ -2546,14 +2454,10 @@ private static final int[] yytableTableCreator() {
      0,    18,    19,    20,     0,     0,    76,    21,     0,     0,
     22,    23,     0,     0,     0,    24,     0,     0,    25
 
-  };
-  return yytable;
-}
+}; }
 
-public static final int yycheck[] = yycheckTableCreator();
-
-private static final int[] yycheckTableCreator() {
-  final int yycheck[] = {
+static public final int yycheck[] = create$yycheck();
+private static int[] create$yycheck() { return new int[] {
      2,
      3,   330,     4,     5,   222,   145,    40,    28,    42,   276,
    330,   438,   194,   163,   196,   191,   137,   443,    13,   454,
@@ -2975,9 +2879,7 @@ private static final int[] yycheckTableCreator() {
     -1,    65,    66,    67,    -1,    -1,    70,    71,    -1,    -1,
     74,    75,    -1,    -1,    -1,    79,    -1,    -1,    82
 
-  };
-  return yycheck;
-}
+}; }
 
 
 
@@ -3007,11 +2909,11 @@ public static void reportError(ILocationContext cxt, String msg) throws CompileE
 public static void reportError(ILocationContext cxt, String msg, boolean errthrow)
         throws CompileException {
     YYLocation lbeg = cxt.lbeg();
-    InputBuffer ibuf = cxt.ibuf();
-    String filename = ibuf.getFileName();
+    JanetSourceReader ibuf = cxt.ibuf();
+    String orig = ibuf.getOriginAsString();
     String line = ibuf.getLine(lbeg);
-    
-    System.err.println(filename + ":" + (lbeg.lineno+1) + ": " + msg);
+
+    System.err.println(orig + ":" + (lbeg.lineno+1) + ": " + msg);
     if (line != null && !line.equals("")) {
 	System.err.println(line);
 
@@ -3043,7 +2945,7 @@ public class Context implements IMutableContext {
 
     public final YYLocation lbeg() { return Parser.this.lbeg(); }
     public final YYLocation lend() { return Parser.this.lend(); }
-    public final InputBuffer ibuf() { return yylex.ibuf(); }
+    public final JanetSourceReader ibuf() { return yylex.ibuf(); }
 
     public final void reportError(String msg) throws CompileException {
 	Parser.this.reportError(this, msg, true);
@@ -3058,7 +2960,7 @@ public class Context implements IMutableContext {
 	//System.out.println("pushing " + unit.getClass().getName());
 	currScope = unit;
     }
-    
+
     public void addVariable(YYVariableDeclarator var) throws CompileException {
 	variables.push(var);
     }
@@ -3079,7 +2981,7 @@ public class Context implements IMutableContext {
 	//System.out.println("popping " + unit.getClass().getName());
 	return unit;
     }
-    
+
 }
 
 Context cxt = new Context();
@@ -3087,7 +2989,7 @@ Context cxt = new Context();
 ILocationContext tokencxt = new ILocationContext() {
 	public final YYLocation lbeg() { return yylex.tokenloc(); }
 	public final YYLocation lend() { return Parser.this.lend(); }
-	public final InputBuffer ibuf() { return yylex.ibuf(); }
+	public final JanetSourceReader ibuf() { return yylex.ibuf(); }
 	public final void reportError(String msg) throws CompileException {
 	    Parser.this.reportError(this, msg, true);
 	}
@@ -3128,5 +3030,7 @@ public YYClass peekClass() {
 }
 */
 
+
+static final String[] yytname = TokenTypes.yytname;
 
 }; /*class*/

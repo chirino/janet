@@ -37,6 +37,8 @@
 package pl.edu.agh.icsr.janet.yytree;
 
 import java.io.IOException;
+import java.io.File;
+import java.net.URL;
 import java.util.*;
 import pl.edu.agh.icsr.janet.tree.Node;
 import pl.edu.agh.icsr.janet.*;
@@ -53,7 +55,7 @@ public class YYNode extends Node implements ILocationContext {
     protected int end_charno0;
     protected int end_line_beg;
 
-    protected InputBuffer ibuf;
+    protected JanetSourceReader ibuf;
 
     public YYNode(ILocationContext cxt) {
         ibuf = cxt.ibuf();
@@ -163,7 +165,7 @@ public class YYNode extends Node implements ILocationContext {
         Parser.compileError(cxt, msg, errthrow);
     }
 */
-    public InputBuffer ibuf() { return ibuf; }
+    public JanetSourceReader ibuf() { return ibuf; }
 
     public YYLocation lbeg() {
         return new YYLocation(beg_lineno, beg_charno, beg_charno0,
@@ -178,7 +180,7 @@ public class YYNode extends Node implements ILocationContext {
     /**
      * Default resolving procedure.
      */
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         for(Iterator i = iterator(); i.hasNext();) {
             ((YYNode)i.next()).resolve();
         }

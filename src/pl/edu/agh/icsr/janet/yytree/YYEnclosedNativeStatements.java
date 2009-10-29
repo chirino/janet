@@ -49,7 +49,7 @@ public class YYEnclosedNativeStatements extends YYStatement {
         this.ncode = ncode;
     }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         ncode.resolve();
         addExceptions(ncode.getExceptionsThrown());
     }

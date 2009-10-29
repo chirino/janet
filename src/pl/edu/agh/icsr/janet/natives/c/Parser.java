@@ -49,7 +49,7 @@ public class Parser implements IParser {
     BlockParser block_parser;
     PureCParser pure_parser;
 
-    public void init(InputBuffer ibuf, PrintWriter yyerr,
+    public void init(JanetSourceReader ibuf, PrintWriter yyerr,
                      YYLocation loc, EmbeddedParser jeparser, int dbg_level) {
         lexer = new Lexer(ibuf, jeparser);
         (expr_parser = new ExpressionParser(lexer, yyerr)).setdebug(dbg_level);

@@ -78,7 +78,7 @@ public class YYNativeStatement extends YYStatement implements INativeMethodInfo 
         return this;
     }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         if (implementation != null) {
             implementation.resolve();
             addExceptions(implementation.getExceptionsThrown());
@@ -128,7 +128,7 @@ public class YYNativeStatement extends YYStatement implements INativeMethodInfo 
         return declaringClass;
     }
 
-    public String getArgumentSignature() throws CompileException {
+    public String getArgumentSignature() throws ParseException {
         if (argsignature != null) return argsignature;
         lock();
         String s = "";
@@ -139,11 +139,11 @@ public class YYNativeStatement extends YYStatement implements INativeMethodInfo 
         return argsignature = s;
     }
 
-    public String getJLSSignature() throws CompileException {
+    public String getJLSSignature() throws ParseException {
         return "(" + getArgumentSignature() + ")";
     }
 
-    public String getJNISignature() throws CompileException {
+    public String getJNISignature() throws ParseException {
         return getJLSSignature() + "V";
     }
 
@@ -178,7 +178,7 @@ public class YYNativeStatement extends YYStatement implements INativeMethodInfo 
             for (int i=0; i<params.length; i++) {
                 paramtypes[i] = params[i].getType();
             }
-        } catch (CompileException e) {
+        } catch (ParseException e) {
             throw new RuntimeException();
         }
         return paramtypes;
@@ -215,7 +215,7 @@ public class YYNativeStatement extends YYStatement implements INativeMethodInfo 
             try {
                 w.write(params[i].getType().getFullName() + " ");
                 w.write(params[i].getName());
-            } catch (CompileException e) {
+            } catch (ParseException e) {
                 throw new RuntimeException();
             }
         }
@@ -228,7 +228,7 @@ public class YYNativeStatement extends YYStatement implements INativeMethodInfo 
             IClassInfo exc = (IClassInfo)i.next();
             try {
                 if (classMgr.isUncheckedException(exc)) continue;
-            } catch (CompileException e) {
+            } catch (ParseException e) {
                 throw new RuntimeException();
             }
             if (first) {

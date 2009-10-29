@@ -56,45 +56,6 @@ public static final int YYEOF = EOF;
 
 @TOKENTYPES@
 
-public static final String tokennames[] = {
-@TOKENNAMES@
-};
+@YYTNAME@
 
-public static String tokenname(Integer t)
-{return tokenname(t==null?EOF:t.intValue());}
-
-public static String tokenname(int t)
-{
-    if(t >= tokenmin && t <= tokenmax) {
-	return tokennames[t - tokenmin];
-    } else if(t > 0 && t <= 255) {
-	return "'" + String.valueOf((char)t) + "'";
-    } else if(t == EOF) {
-	return "EOF";
-    } else {
-	return "$undefined$";
-    }
-}
-
-//////////////////////////////////////////////////
-
-public static final int nontermmin = @NONTERMMIN@;
-public static final int nontermmax = @NONTERMMAX@;
-
-@NONTERMTYPES@
-
-public static final String nontermnames[] = {
-@NONTERMNAMES@
-};
-
-public static String nontermname(int t)
-{
-    if(t >= nontermmin && t <= nontermmax) {
-	return nontermnames[t - nontermmin];
-    } else {
-	return "$undefined$";
-    }
-}
-
-//////////////////////////////////////////////////
 };

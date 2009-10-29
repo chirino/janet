@@ -71,7 +71,7 @@ public class YYClassInstanceCreationExpression extends YYExpression {
         return classidx;
     }
 
-    public void resolve(boolean isSubexpression) throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         // resolve type
         expressionType = unresolvedType.getResolvedType();
 

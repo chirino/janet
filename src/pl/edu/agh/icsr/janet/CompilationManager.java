@@ -37,34 +37,91 @@
 package pl.edu.agh.icsr.janet;
 
 import java.util.*;
+import java.net.URL;
+import java.io.*;
 import pl.edu.agh.icsr.janet.yytree.*;
 import pl.edu.agh.icsr.janet.reflect.*;
 
 public class CompilationManager {
 
-    Vector compUnits;
+    Map compUnits;
     ClassManager classMgr;
+    Janet.Settings settings;
+
+    // Current (during parsing) library name as specified by the -library flag
+    String currentLibName;
 
     public CompilationManager(Janet.Settings settings) {
-        compUnits = new Vector();
-        classMgr = new ClassManager(settings);
+        compUnits = new HashMap();
+        this.settings = settings;
+        classMgr = new ClassManager(this, settings);
     }
 
-    public void addCompilationUnit(YYCompilationUnit unit) {
-        compUnits.add(unit);
+    /**
+     * Phase 1: parse files
+     * @param input
+     * @param markForTranslation
+     */
+    public void parse(URL originURL, File originFile,
+                      boolean markForTranslation)
+        throws ParseException, IOException
+    {
+        if (compUnits.containsKey(originURL)) {
+            // was parsed already
+            return;
+        }
+        JanetSourceReader jreader = new JanetSourceReader(originURL, originFile,
+            1024, settings.getSrcEncoding());
+        Preprocessor jp = new Preprocessor(jreader);
+        Lexer jl = new Lexer(jp, settings.getFErr(), settings.getDbgLevel());
+        Parser parser = new Parser(jl, settings.getFErr());
+
+        parser.setdebug(settings.getDbgLevel());
+        parser.yyerrthrow = true;
+        parser.yyparse(this, markForTranslation);
     }
 
-//    void resolveClasses() {}
-//    void resolveReferences() {}
-    void translate(Janet.Settings settings) {
+    public void setCurrentLibName(String libName) {
+        this.currentLibName = libName;
+    }
+
+    public String getCurrentLibName() {
+        return currentLibName;
+    }
+
+    /**
+     * Phase 2: resolve semantic dependences
+     * @param fileName
+     * @param isInput
+     */
+    public void resolve() throws ParseException {
+        Iterator i = compUnits.values().iterator();
+        while (i.hasNext()) {
+            ((YYCompilationUnit)i.next()).resolve();
+        }
+    }
+
+    /**
+     * Phase 3: write output
+     * @param fileName
+     * @param isInput
+     */
+    void translate() {
         Writer w = new Writer(this, settings);
         w.write();
+    }
+
+
+
+
+    public void addCompilationUnit(YYCompilationUnit unit) {
+        compUnits.put(unit.ibuf().getOriginURL(), unit);
     }
 
     public String toString() {
         String s = "";
         Iterator i;
-        for (i = compUnits.iterator(); i.hasNext(); ) {
+        for (i = compUnits.values().iterator(); i.hasNext(); ) {
             s += ((YYCompilationUnit)i.next()).dump() + "\n\n";
         }
 
@@ -75,7 +132,7 @@ public class CompilationManager {
     public String dumpTree() {
         String s = "";
         Iterator i;
-        for (i = compUnits.iterator(); i.hasNext(); ) {
+        for (i = compUnits.values().iterator(); i.hasNext(); ) {
             s += ((YYCompilationUnit)i.next()).dump() + "\n\n";
         }
 
@@ -89,13 +146,6 @@ public class CompilationManager {
         return classMgr;
     }
 
-    public void resolve() throws CompileException {
-        Iterator i = compUnits.iterator();
-        while (i.hasNext()) {
-            ((YYCompilationUnit)i.next()).resolve();
-        }
-    }
-
     public static String getCanonicLanguageName(String language) {
         String s = language.toLowerCase();
         s = replace(s, "+", "plus");
@@ -103,6 +153,13 @@ public class CompilationManager {
         return s;
     }
 
+    /**
+     * Helper method
+     * @param s
+     * @param what
+     * @param for_what
+     * @return
+     */
     private static String replace(String s, String what, String for_what) {
         StringBuffer b = new StringBuffer(s);
         int pos;
@@ -113,5 +170,4 @@ public class CompilationManager {
         }
         return b.toString();
     }
-
 }

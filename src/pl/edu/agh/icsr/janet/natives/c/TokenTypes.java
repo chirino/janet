@@ -80,13 +80,13 @@ public static String tokenname(Integer t)
 public static String tokenname(int t)
 {
     if(t >= tokenmin && t <= tokenmax) {
-	return tokennames[t - tokenmin];
+        return tokennames[t - tokenmin];
     } else if(t > 0 && t <= 255) {
-	return "'" + String.valueOf((char)t) + "'";
+        return "'" + String.valueOf((char)t) + "'";
     } else if(t == EOF) {
-	return "EOF";
+        return "EOF";
     } else {
-	return "$undefined$";
+        return "$undefined$";
     }
 }
 
@@ -136,9 +136,9 @@ null
 public static String nontermname(int t)
 {
     if(t >= nontermmin && t <= nontermmax) {
-	return nontermnames[t - nontermmin];
+        return nontermnames[t - nontermmin];
     } else {
-	return "$undefined$";
+        return "$undefined$";
     }
 }
 

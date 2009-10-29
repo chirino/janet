@@ -199,7 +199,7 @@ public class YYMethod extends YYNode implements IMethodInfo, IScope {
         return modifiers;
     }
 
-    private IClassInfo resolveReturnType() throws CompileException {
+    private IClassInfo resolveReturnType() throws ParseException {
         if (isConstructor()) {
             return returnType = cls.getClassManager().VOID;
         }
@@ -211,7 +211,7 @@ public class YYMethod extends YYNode implements IMethodInfo, IScope {
         return returnType;
     }
 
-    public IClassInfo getReturnType() throws CompileException {
+    public IClassInfo getReturnType() throws ParseException {
         if (returnType != null) return returnType;
         lock();
         return returnType = resolveReturnType();
@@ -221,7 +221,7 @@ public class YYMethod extends YYNode implements IMethodInfo, IScope {
         return this.type == CONSTRUCTOR;
     }
 
-    public String getArgumentSignature() throws CompileException {
+    public String getArgumentSignature() throws ParseException {
         if (argsignature != null) return argsignature;
         lock();
         String s = "";
@@ -233,18 +233,18 @@ public class YYMethod extends YYNode implements IMethodInfo, IScope {
         return argsignature = s;
     }
 
-    public String getJLSSignature() throws CompileException {
+    public String getJLSSignature() throws ParseException {
         if (signature != null) return signature;
         return signature = "(" + getArgumentSignature() + ")";
     }
 
-    public String getJNISignature() throws CompileException {
+    public String getJNISignature() throws ParseException {
         if (jnisignature != null) return jnisignature;
         return jnisignature = getJLSSignature() +
             getReturnType().getSignature();
     }
 
-    public Map getExceptionTypes() throws CompileException { // JLS 8.4.4
+    public Map getExceptionTypes() throws ParseException { // JLS 8.4.4
         if (throwlist != null) return throwlist;
         lock();
         throwlist = new HashMap();
@@ -290,7 +290,7 @@ public class YYMethod extends YYNode implements IMethodInfo, IScope {
             for (int i=0; i<params.length; i++) {
                 paramtypes[i] = params[i].getType();
             }
-        } catch (CompileException e) {
+        } catch (ParseException e) {
             throw new RuntimeException();
         }
         return paramtypes;
@@ -300,7 +300,7 @@ public class YYMethod extends YYNode implements IMethodInfo, IScope {
     public YYClass getCurrentClass() { return cls; }
     public IScope getCurrentMember() { return this; }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         lock();
         if (body == null) return;
         body.resolve();
@@ -334,7 +334,7 @@ public class YYMethod extends YYNode implements IMethodInfo, IScope {
                        : "method " + getReturnType().getFullName() + " " +
                            getName()) +
                 "(" + cls.classMgr.getTypeNames(getParameterTypes()) + ")";
-        } catch(CompileException e) { throw new IllegalStateException(); }
+        } catch (ParseException e) { throw new IllegalStateException(); }
     }
 
     public String describe() {
@@ -354,7 +354,7 @@ public class YYMethod extends YYNode implements IMethodInfo, IScope {
                 }
             }
             return s;
-        } catch (CompileException e) {
+        } catch (ParseException e) {
             return "exception has occured";
         }
     }

@@ -74,7 +74,7 @@ public class YYAssignmentExpression extends YYExpression {
         }
     }
 
-    public void resolve(boolean isSubexpression) throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         leftHandSide.resolve(true);
         if (!leftHandSide.isVariable()) {
             leftHandSide.reportError("variable required but value found " +
@@ -113,7 +113,7 @@ public class YYAssignmentExpression extends YYExpression {
 
     }
 
-    private boolean checkTypes() throws CompileException {
+    private boolean checkTypes() throws ParseException {
         IClassInfo leftType = leftHandSide.getExpressionType();
         IClassInfo rightType = assignment.getExpressionType();
 

@@ -70,5 +70,5 @@ public interface IScope extends ILocationContext {
     IScope getCurrentMember();
     YYClass getCurrentClass();
 
-    void resolve() throws CompileException;
+    void resolve() throws ParseException;
 }

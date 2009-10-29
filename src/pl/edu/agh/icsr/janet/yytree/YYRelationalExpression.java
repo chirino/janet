@@ -66,7 +66,7 @@ public class YYRelationalExpression extends YYExpression {
         this.e2 = e2;
     }
 
-    public void resolve(boolean isSubexpression) throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         e1.resolve(true);
         e2.resolve(true);
         IClassInfo c1 = e1.getExpressionType();

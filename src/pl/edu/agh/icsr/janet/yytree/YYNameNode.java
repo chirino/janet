@@ -183,7 +183,7 @@ public class YYNameNode extends YYNode implements IDetailedLocationContext {
      * When all classes are already parsed and any semantic information is
      * known (JLS 6.5.2)
      */
-    public Object reclassify() throws CompileException {
+    public Object reclassify() throws ParseException {
         YYNameNode nn = prevNameNode();
         IClassInfo cls = null;
         ClassManager classMgr = getName().getClassManager();

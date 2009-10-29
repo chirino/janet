@@ -45,7 +45,7 @@ public interface IClassInfo {
     final static int CAST_INCORRECT        = 3;
 
     IClassInfo getDeclaringClass() throws CompileException;
-    IClassInfo getSuperclass() throws CompileException;
+    IClassInfo getSuperclass() throws ParseException;
     boolean isInterface() throws CompileException;
     boolean isArray();
     boolean isPrimitive();
@@ -59,20 +59,20 @@ public interface IClassInfo {
     IClassInfo getComponentType() throws CompileException;
     IClassInfo getArrayType() throws CompileException;
     IClassInfo getArrayType(int dims) throws CompileException;
-    Map getInterfaces() throws CompileException;
-    Map getDeclaredFields() throws CompileException;
-    SortedMap getAccessibleFields() throws CompileException;
-    SortedMap getFields(String name) throws CompileException;
-    SortedMap getDeclaredMethods() throws CompileException;
-    SortedMap getAccessibleMethods() throws CompileException;
-    SortedMap getMethods(String name) throws CompileException;
-    SortedMap getMethods(String name, String jlssign) throws CompileException;
-    Map getConstructors() throws CompileException;
+    Map getInterfaces() throws ParseException;
+    Map getDeclaredFields() throws ParseException;
+    SortedMap getAccessibleFields() throws ParseException;
+    SortedMap getFields(String name) throws ParseException;
+    SortedMap getDeclaredMethods() throws ParseException;
+    SortedMap getAccessibleMethods() throws ParseException;
+    SortedMap getMethods(String name) throws ParseException;
+    SortedMap getMethods(String name, String jlssign) throws ParseException;
+    Map getConstructors() throws ParseException;
 //    boolean equals(IClassInfo cls) throws CompileException;
     // in terms of method invocation conversion (JLS 5.3)
-    boolean isAssignableFrom(IClassInfo cls) throws CompileException;
-    int isCastableTo(IClassInfo cls) throws CompileException;
-    boolean isSubclassOf(IClassInfo cls) throws CompileException; // sub or this
+    boolean isAssignableFrom(IClassInfo cls) throws ParseException;
+    int isCastableTo(IClassInfo cls) throws ParseException;
+    boolean isSubclassOf(IClassInfo cls) throws ParseException; // sub or this
 
     void setWorkingFlag(boolean working);
     boolean getWorkingFlag();

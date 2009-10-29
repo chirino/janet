@@ -63,12 +63,12 @@ public abstract class YYExpression extends YYStatement
         return castedImplicitlyToType;
     }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         resolve(false);
     }
 
     public abstract void resolve(boolean isSubexpression)
-            throws CompileException;
+            throws ParseException;
 
     public boolean isVariable() throws CompileException { return false; }
 

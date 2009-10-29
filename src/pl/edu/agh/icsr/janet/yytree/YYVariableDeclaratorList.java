@@ -116,6 +116,6 @@ public class YYVariableDeclaratorList extends YYStatement {
                 if (i.hasNext()) s += ", ";
             }
             return s;
-        } catch (CompileException e) { throw new IllegalStateException(); }
+        } catch (ParseException e) { throw new IllegalStateException(); }
     }
 }

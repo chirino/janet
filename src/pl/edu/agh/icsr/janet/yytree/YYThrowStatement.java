@@ -50,7 +50,7 @@ public class YYThrowStatement extends YYStatement {
         this.exception = exception;
     }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         ClassManager classMgr = getCurrentClass().getClassManager();
         exception.resolve();
         IClassInfo exctype = exception.getExpressionType();

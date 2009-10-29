@@ -58,7 +58,7 @@ class Lexer {
 
 
     YYToken token;
-    InputBuffer ibuf;
+    JanetSourceReader ibuf;
     YYLocation pbeg;
     YYLocation loc;
     StringBuffer lexbuf;
@@ -201,7 +201,7 @@ class Lexer {
         return lexbuf;
     }
 
-    public InputBuffer ibuf() {
+    public JanetSourceReader ibuf() {
         return ibuf;
     }
 

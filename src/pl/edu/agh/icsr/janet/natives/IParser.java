@@ -36,7 +36,7 @@
 
 package pl.edu.agh.icsr.janet.natives;
 
-import pl.edu.agh.icsr.janet.InputBuffer;
+import pl.edu.agh.icsr.janet.JanetSourceReader;
 import pl.edu.agh.icsr.janet.EmbeddedParser;
 import pl.edu.agh.icsr.janet.YYToken;
 import pl.edu.agh.icsr.janet.YYResultReceiver;
@@ -65,13 +65,13 @@ public interface IParser {
 
 
 /*
-    public void init(InputBuffer ibuf,
+    public void init(JanetSourceReader ibuf,
                      YYLocation pbeg, YYLocation loc,
                      YYToken token, StringBuffer lexbuf,
                      EmbeddedParser jparser);
     public void prepare(IYYContext yycxt);
 */
-    public void init(InputBuffer ibuf, java.io.PrintWriter yyerr,
+    public void init(JanetSourceReader ibuf, java.io.PrintWriter yyerr,
                      YYLocation loc, EmbeddedParser jparser,
                      int dbglevel);
 

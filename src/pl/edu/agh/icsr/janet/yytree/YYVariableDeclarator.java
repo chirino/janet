@@ -99,7 +99,7 @@ public class YYVariableDeclarator extends YYStatement implements IFieldInfo {
         return this;
     }
 
-    private void resolveType() throws CompileException {
+    private void resolveType() throws ParseException {
         resolvedType = dims == 0 ? yytype.getResolvedType()
                                  : yytype.getResolvedType().getArrayType(dims);
         dims = 0;
@@ -114,7 +114,7 @@ public class YYVariableDeclarator extends YYStatement implements IFieldInfo {
         return modifiers;
     }
 
-    public IClassInfo getType() throws CompileException {
+    public IClassInfo getType() throws ParseException {
         if (resolvedType == null) resolveType();
         return resolvedType;
     }
@@ -129,7 +129,7 @@ public class YYVariableDeclarator extends YYStatement implements IFieldInfo {
         return this;
     }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         if (initializer != null) {
             initializer.resolve(true);
             initializer.setImplicitCastType(this.getType());
@@ -157,6 +157,6 @@ public class YYVariableDeclarator extends YYStatement implements IFieldInfo {
         try {
             return YYModifierList.toString(modifiers) + getType() + " " +
                 name + (initializer != null ? " = " + initializer : "");
-        } catch (CompileException e) { return null; }
+        } catch (ParseException e) { return null; }
     }
 }

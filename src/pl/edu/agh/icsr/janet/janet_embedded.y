@@ -838,7 +838,7 @@ public static void notSupported(IJavaContext cxt, String what) throws CompileExc
 IMutableContext cxt = new IMutableContext() {
 	public final YYLocation lbeg() { return EmbeddedParser.this.lbeg(); }
 	public final YYLocation lend() { return EmbeddedParser.this.lend(); }
-	public final InputBuffer ibuf() { return outer_cxt.ibuf(); }
+	public final JanetSourceReader ibuf() { return outer_cxt.ibuf(); }
 
 	public final void reportError(String msg) throws CompileException { pl.edu.agh.icsr.janet.Parser.reportError(this, msg); }
 
@@ -855,7 +855,7 @@ IMutableContext cxt = new IMutableContext() {
 ILocationContext tokencxt = new ILocationContext() {
 	public final YYLocation lbeg() { return yylex.tokenloc(); }
 	public final YYLocation lend() { return cxt.lend(); }
-	public final InputBuffer ibuf() { return cxt.ibuf(); }
+	public final JanetSourceReader ibuf() { return cxt.ibuf(); }
 	public final void reportError(String msg) throws CompileException {
 	    throw new UnsupportedOperationException();
 	}

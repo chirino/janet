@@ -53,7 +53,7 @@ public class YYReturnStatement extends YYStatement { // JLS 14.16
         classMgr = cxt.getClassManager();
     }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         if (retexpr != null) {
             retexpr.resolve(false);
         }

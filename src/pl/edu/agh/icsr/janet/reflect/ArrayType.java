@@ -182,12 +182,12 @@ class ArrayType implements IClassInfo {
         return dclfields;
     }
 
-    public SortedMap getAccessibleFields() throws CompileException {
+    public SortedMap getAccessibleFields() throws ParseException {
         if (accfields != null) return accfields;
         return accfields = classMgr.getAccessibleFields(this);
     }
 
-    public SortedMap getFields(String name) throws CompileException {
+    public SortedMap getFields(String name) throws ParseException {
         return classMgr.getFields(this, name);
     }
 
@@ -201,18 +201,18 @@ class ArrayType implements IClassInfo {
 //        return dclmethods = new TreeMap();
     }
 
-    public SortedMap getAccessibleMethods() throws CompileException {
+    public SortedMap getAccessibleMethods() throws ParseException {
         if (accmethods != null) return accmethods;
         // the same as in java.lang.Object
         return accmethods = getSuperclass().getAccessibleMethods();
     }
 
-    public SortedMap getMethods(String name) throws CompileException {
+    public SortedMap getMethods(String name) throws ParseException {
         return classMgr.getMethods(this, name);
     }
 
     public SortedMap getMethods(String name, String jlssignature)
-            throws CompileException {
+            throws ParseException {
         return classMgr.getMethods(this, name, jlssignature);
     }
 
@@ -229,8 +229,8 @@ class ArrayType implements IClassInfo {
         return workingFlag;
     }
 
-    public boolean isAssignableFrom(IClassInfo clsFrom)
-            throws CompileException { // JLS 5.1.4
+    public boolean isAssignableFrom(IClassInfo clsFrom) throws ParseException {
+        // JLS 5.1.4
         if (clsFrom == classMgr.Object ||
                 clsFrom == classMgr.Cloneable ||
                 clsFrom == classMgr.Serializable) return true;
@@ -241,7 +241,7 @@ class ArrayType implements IClassInfo {
             (!c1.isPrimitive() && !c2.isPrimitive() && c1.isAssignableFrom(c2));
     }
 
-    public int isCastableTo(IClassInfo clsTo) throws CompileException {
+    public int isCastableTo(IClassInfo clsTo) throws ParseException {
         if (isAssignableFrom(clsTo)) {
             return CAST_CORRECT;
         }

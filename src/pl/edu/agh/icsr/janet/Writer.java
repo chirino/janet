@@ -69,12 +69,22 @@ public class Writer {
     }
 
     public void write() {
-        Iterator cunits = compMgr.compUnits.iterator();
+        Iterator cunits = compMgr.compUnits.values().iterator();
         while (cunits.hasNext()) {
             YYCompilationUnit cunit = (YYCompilationUnit)cunits.next();
-            jFilename = toJavaFilename(cunit.ibuf().getFileName());
-            File jOutput = new File(settings.targetDirectory, jFilename);
+            if (!cunit.markedForProcessing()) {
+                // skip this file
+                continue;
+            }
+
+            jFilename = cunit.ibuf().getOriginFile().getName();
+
+            // apply appropriate file type suffix (".java")
+            jFilename = toJavaFilename(jFilename);
+
             try {
+                File dir = getOutDirForInput(cunit.ibuf(), settings);
+                File jOutput = new File(dir, jFilename);
                 javaFileWriter = new BufferedWriter(new FileWriter(jOutput));
                 subst.setSubst("__JAVAFILENAME__", jFilename);
                 subst.setSubst("__DATE__", new Date().toString());
@@ -90,6 +100,37 @@ public class Writer {
             }
         }
     }
+
+    public static File getOutDirForInput(JanetSourceReader rdr, Janet.Settings settings)
+        throws IOException
+    {
+        File srcFile = rdr.getOriginFile();
+        File dir = settings.getTargetDirectory();
+
+        if (!dir.exists()) {
+            throw new IOException("Output directory: " + dir + " does not exist");
+        }
+
+        if (!srcFile.isAbsolute()) {
+            String parent = srcFile.getParent();
+            if (parent != null) {
+                dir = new File(dir, parent);
+            }
+        }
+
+        if (dir.exists()) {
+            if (!dir.isDirectory()) {
+                throw new IOException(dir.toString() + " is not a directory");
+            }
+            return dir;
+        }
+        // not exists
+        if (!dir.mkdirs()) {
+            throw new IOException("cannot create directory: " + dir);
+        }
+        return dir;
+    }
+
 
     public void write(String s) throws IOException {
         write(s, false);

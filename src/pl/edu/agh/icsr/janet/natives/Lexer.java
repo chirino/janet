@@ -36,7 +36,7 @@
 
 package pl.edu.agh.icsr.janet.natives;
 
-import pl.edu.agh.icsr.janet.InputBuffer;
+import pl.edu.agh.icsr.janet.JanetSourceReader;
 import pl.edu.agh.icsr.janet.YYToken;
 import pl.edu.agh.icsr.janet.YYLocation;
 import pl.edu.agh.icsr.janet.IMutableContext;
@@ -54,7 +54,7 @@ public abstract class Lexer {
     public static final int JAVA_STATEMENTS   = 204;
     public static final int JAVA_END          = 205;
 
-    protected InputBuffer ibuf;
+    protected JanetSourceReader ibuf;
     protected YYToken token;
     protected YYLocation pbeg;
     protected YYLocation loc;
@@ -62,7 +62,7 @@ public abstract class Lexer {
     protected int lexmode;            // native or embedded Java
     protected EmbeddedParser jeparser;
 
-    protected Lexer(InputBuffer ibuf, EmbeddedParser jeparser) {
+    protected Lexer(JanetSourceReader ibuf, EmbeddedParser jeparser) {
         this.ibuf = ibuf;
         this.pbeg = new YYLocation();
         this.loc = ibuf.loc();
@@ -111,7 +111,7 @@ public abstract class Lexer {
         return lexbuf;
     }
 
-    public InputBuffer ibuf() {
+    public JanetSourceReader ibuf() {
         return ibuf;
     }
 

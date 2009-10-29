@@ -77,7 +77,7 @@ public class YYExpressionList extends YYStatement {
 
     public int getLength() { return length; }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         for(Iterator i = iterator(); i.hasNext();) {
             YYExpression e = (YYExpression)i.next();
             e.resolve(true);

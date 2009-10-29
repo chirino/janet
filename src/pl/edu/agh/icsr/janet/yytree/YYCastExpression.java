@@ -128,7 +128,7 @@ public class YYCastExpression extends YYExpression {
         return pkg;
     }
 
-    public void resolve(boolean isSubexpression) throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         expressionType = unresolvedType.getResolvedType();
         if (!expressionType.isPrimitive() && !expressionType.isReference()) {
             // unlike to occur, see grammar; if expression -> must be a name

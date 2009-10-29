@@ -1,27 +1,27 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html>
 <head>
-<title>JANET 1.0 Release Notes</title>
+<title>JANET 1.1 Release Notes</title>
 </head>
 
 <BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#000077" ALINK="#FF0000">
 
 <font size="+1"><pre>
 /*****************************************************************
- * Release Notes: Java Native Extensions (JANET) 1.0             *
- * The first public release                                      *
- * 30 December 2001                                              *
+ * Release Notes: Java Native Extensions (JANET) 1.1             *
+ * 22 June 2003                                                  *
  *****************************************************************/</pre>
 </font>
 
 <p>
-This is a first publictly released version of JANET tool. You will find in this file:
+This document describes JANET tool version 1.1. You will find in this file:
     <ul>
       <li><a href="#install">Installation Instructions</a></li>
       <li><a href="#usage">How to use JANET?</a></li>
+      <li><a href="#changelog">Change Log</a></li>
       <li><a href="#supported">Functionality supported in this release</a></li>
       <li><a href="#notsupported">Functionality not supported in this release</a></li>
-      <li><a href=#bugs>Reporting bugs</a></li>
+      <li><a href="#bugs">Reporting bugs</a></li>
     </ul>
 </p>
 
@@ -29,11 +29,11 @@ This is a first publictly released version of JANET tool. You will find in this 
 
 <p>
 To install JANET, simply download and decompress the file
-<code>janet-1.0.zip</code> in a place convenient to you. The <code>janet</code>
+<code>janet-1.1.zip</code> in a place convenient to you. The <code>janet</code>
 directory will be created, along with following files and subdirectories:
 <ul>
-  <li><code>README.html</code> - general information
-  <li><code>relnotes.html</code> - this document
+  <li><code>README</code> - general information
+  <li><code>release-notes.html</code> - this document
   <li><code>license.html</code> - licensing information
   <li><code>lib/</code> - class files for JANET tool and utilities
   <li><code>doc/</code> - documentation (currently, for utility classes only)
@@ -48,7 +48,7 @@ directory will be created, along with following files and subdirectories:
 <h2><a name=usage>How to use JANET?</a></h2>
 
 <p>
-JANET is a pure Java application. To use it, you must have a Java 2 Runtime Environment.
+JANET is a pure Java application. To use it, you must have a Java 2 Runtime Environment
 installed. JANET executables are placed in the JAR file <code>lib/janet.jar</code>.
 To start the translator, type:
 </p>
@@ -57,12 +57,12 @@ To start the translator, type:
 </p>
 
 <p>
-If you do not specify any source files, JANET will display the list of recognized command-line
-options.
+If you invoke JANET without any options or source files, it will display the list of
+recognized command-line options.
 </p>
 
 <p>
-If you are UNIX user, you may start the translator alternatively through a shell script
+If you are UNIX user, you may start the translator more conveniently using a shell script
 <code>bin/janet</code>:
 </p>
 <p>
@@ -72,22 +72,24 @@ If you are UNIX user, you may start the translator alternatively through a shell
 <p>
 JANET translator creates a set of Java and C source files. You need to compile Java files
 using your Java compiler. The C source files must be compiled into dynamically linked
-library (or libraries). Mapping from source files to libraries is dependent
-on the names of your classes. If your classes are defined
-in a named package, create one dynamic library per each package. The library
-name must be the same as package name with dots replaced by underscores.
+library (or libraries). By default, mapping from source file names to library names is
+is based on the package in which the classes are defined. If it is a named package,
+JANET assumes that you create one dynamic library per each package. The library
+name must match the package name with dots replaced by underscores.
 For instance, the library for package com.foo would be libcom_foo.so under Linux and
 com_foo.dll under Windows. If the classes are defined in default (unnamed) package,
 create one library per class and name the library with the name of the class.
+This default mapping can be overridden using the "-libname" command-line option
+<strong>(new!)</strong>.
 </p>
+
 <p>
-JANET does not provide support for
-the compilation of dynamic libraries - the process is platform dependent and must be
-done by you. Some
+JANET does not directly provide support for the compilation of dynamic libraries,
+as the process is platform-dependent. Some
 <a href="http://java.sun.com/docs/books/tutorial/native1.1/stepbystep/step5.html">
 instructions</a> are provided in the
 <a href="http://java.sun.com/docs/books/tutorial/native1.1/index.html">JNI tutorial</a>.
-You may also refer to the sample makefile in the <code>examples</code> subdirectory.
+You may also refer to the sample GNU makefile in the <code>examples</code> subdirectory.
 Important things to remember when compiling your libraries are:
 <UL>
 <LI>Add the directory <code>janet/native/c/include</code> to the include path of
@@ -105,9 +107,10 @@ Important things to remember when compiling your libraries are:
 <p>
 And finally, some general-purpose hints for using JANET:
 <ul>
-<li>JANET parser is not very user-friendly when it comes to reporting compilation errors.
-Often, the missing back-quote character may result in a parse problem somewhere else in
-the source file. The <code>-dumptree</code> option (which enables displaying parsing trees
+<li>Sometimes JANET parser is, unfortunately, not too user-friendly in regard to
+reporting compilation errors. Often, the missing back-quote character may result in a
+parse problem somewhere else in the source file.
+The <code>-dumptree</code> option (which enables displaying parsing trees
 for processed files) may be helpful to identify such errors.</li>
 <li>Remember that embedded Java statements, such as a return statement or variable declaration,
     must end with semicolon. That is, write <code>`int i;`</code> rather than
@@ -119,6 +122,28 @@ for processed files) may be helpful to identify such errors.</li>
 </ul>
 <p>
 
+<h2><a name=changelog>Change Log</a></h2>
+
+<h3>Version 1.1</h3>
+
+<ul>
+<li>Invocation syntax changed to be more <code>javac-alike</code>, and more user-friendly
+    in general.</li>
+<li>It is now possible to specify -classpath and -sourcepath as command-line parameters,
+    allowing JANET to properly process sources dependent on external classes.</li>
+<li>It is now possible to specify names of dynamic libraries. The libraries may be assigned
+    to individual classes, or to groups of classes.</li>
+<li>Output generation for file hierarchies now follows <code>javac</code> semantics.
+    By default, output files are generated in the same directories as source files.
+    This can be overridden by specifying the output directory; however, JANET will
+    still maintain source hierarchy and it will create appropriate subdirectories
+    as needed.</li>
+</ul>
+
+<h3>Version 1.0</h3>
+
+Initial release
+
 <h2><a name=supported>Functionality supported in this release</a></h2>
 
 <p>
@@ -126,9 +151,10 @@ JANET allows for embedding native code inside Java source files.
 That embedded native code may in turn contain embedded Java statements
 and expressions, later translated by JANET into JNI function invocations.
 Ideally, any valid Java expression should be recognized by the
-translator. However, it is not yet the case.
-All kinds of Java expressions and statements recognized and handled
-by this version of JANET when embedded into native code are:
+translator. However, it is not yet the case - most of the expression types
+are recognized and properly handled, but some of more sophisticated are not.
+The full list of embeddable Java expressions and statements recognized and
+handled by this version of JANET is given below:
 
 <UL>
 <LI>Blocks [<A HREF="http://java.sun.com/docs/books/jls/second_edition/html/statements.doc.html#246838" target="_top">14.2</A>],</LI>
@@ -208,22 +234,23 @@ Limitations of the current version of JANET translator include:
 <LI>Lack of support for embedding native languages other than C.
     Note, however, that JANET introduces no syntactic restrictions on the embedded C
     code, because it does not perform its semantic analysis beyond simple block and
-    comment detection.</LI>
+    comment detection. Therefore, your C code can still invoke non-C routines
+    using common linking techniques.</LI>
 <LI>Inner classes are not fully supported -
-    native code may not appear inside inner classes and it may not refer to them. (However,
-    the pure-Java inner classes, as well as other syntactic extensions introduced
-    in Java 1.1, are recognized.)</LI>
+    native code may not appear inside inner classes and it may not refer to them. However,
+    pure-Java inner classes, as well as other syntactic extensions introduced
+    in Java 1.1, are recognized.</LI>
 <LI>Certain kinds of Java expressions may not be embedded into native code.
     The detailed list is given below.</LI>
 <LI>JANET translator does not recover from errors.
     The translation stops on the first parse or compile error encountered
-    so no more than one error per a compilation is reported.</LI>
+    so no more than one error per a compilation run is reported.</LI>
 </UL>
 </p>
 
 <p>
-Expression types not recognized by this version of JANET
-when embedded into native code include:
+Java expression types that may not currently be embedded into
+native code include:
 
 <UL>
 <LI>Class Literals
@@ -304,9 +331,8 @@ specifications.
 <h2><a name=bugs>Reporting bugs</a></h2>
 
 <p>
-This is a first release of JANET. Although I use this release for some time
-and it seems to work very nice, it may still contain bugs. If you find one,
-please report it so that JANET could be improved. To submit a bug, please use
+As any other software, JANET may likely contain bugs. If you find one,
+please report it to help to improve quality of JANET. To submit a bug, please use
 <a href="https://sourceforge.net/tracker/?func=add&group_id=42947&atid=434651" target=_blank>
 sourceforge.net bug submission system</a>. Please include detailed description
 and all relevant source files.

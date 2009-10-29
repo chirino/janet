@@ -62,7 +62,7 @@ public class YYTryStatement extends YYStatement {
         return this;
     }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         body.resolve();
         addExceptions(body.getExceptionsThrown());
         if (catches != null) {
@@ -95,7 +95,7 @@ public class YYTryStatement extends YYStatement {
     public YYStatement getCatches() { return catches; }
     public YYStatement getFinally() { return finly; }
 
-    public boolean catchException(IClassInfo catched) throws CompileException {
+    public boolean catchException(IClassInfo catched) throws ParseException {
         boolean mayBeThrown = false;
         for (Iterator i = exceptions.keySet().iterator(); i.hasNext();) {
             IClassInfo exc = (IClassInfo)i.next();

@@ -65,7 +65,7 @@ public class YYBinaryExpression extends YYExpression {
         op.assign(left, right);
     }
 
-    public void resolve(boolean isSubexpression) throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         left.resolve(true);
         right.resolve(true);
         try {

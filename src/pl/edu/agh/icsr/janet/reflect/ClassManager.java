@@ -38,21 +38,29 @@ package pl.edu.agh.icsr.janet.reflect;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.io.IOException;
+import java.net.URL;
 import pl.edu.agh.icsr.janet.*;
 import pl.edu.agh.icsr.janet.yytree.*;
 import pl.edu.agh.icsr.janet.reflect.*;
 
 public class ClassManager {
 
-    HashMap compClasses = new HashMap(256);
-    HashMap reflClasses = new HashMap(256);
-    HashMap arrayClasses = new HashMap(256);
+    Map compClasses = new HashMap(256);
+    Map reflClasses = new HashMap(256);
+    Map arrayClasses = new HashMap(256);
 
     private boolean locked = false;
+    CompilationManager compMgr;
     Janet.Settings settings;
     public Janet.Settings getSettings() { return settings; }
 
-    public ClassManager(Janet.Settings settings) {
+    /**
+     * @param compMgr compilation manager (to resolve classes from sourcepath)
+     * @param settings
+     */
+    public ClassManager(CompilationManager compMgr, Janet.Settings settings) {
+        this.compMgr = compMgr;
         this.settings = settings;
     }
 
@@ -76,19 +84,46 @@ public class ClassManager {
         return c;
     }
 
-    public IClassInfo forName(String qualified_name) {
+    public IClassInfo forName(String qname) throws ParseException {
         IClassInfo c;
-        c = (IClassInfo)compClasses.get(qualified_name);
-        if (c == null) {
-            c = (IClassInfo)reflClasses.get(qualified_name);
+
+        // check if already defined in parsed files
+        c = (IClassInfo)compClasses.get(qname);
+        if (c != null) return c;
+
+        // check if already defined by reflection
+        c = (IClassInfo)reflClasses.get(qname);
+        if (c != null) return c;
+
+        try {
+            // look at the classpath
+            Class cls = settings.getClassLoader().loadClass(qname);
+            c = new ClassInfoReflected(cls, this);
+            reflClasses.put(qname, c);
+            return c;
+        } catch (ClassNotFoundException e) {}
+
+        // look at the sourcepath (no inner classes supported)
+        String jfile = qname.replace('.', '/') + ".java";
+        URL url = settings.getSourceLoader().getResource(jfile);
+
+        try {
+            if (url != null) {
+                // parse the file and add the compilation unit to the compMgr
+                compMgr.parse(url, null, false);
+
+                // if the class was defined in that source file, it should now
+                // be visible through compClasses
+                c = (IClassInfo)compClasses.get(qname);
+                if (c != null) return c;
+            }
         }
-        if (c == null) {
-            try {
-                reflClasses.put(qualified_name, c = new ClassInfoReflected(
-                    java.lang.Class.forName(qualified_name), this));
-            } catch (ClassNotFoundException e) {}
+        catch (IOException e) {
+            throw new ParseException(e.getMessage());
         }
-        return c;
+
+        // give up: not found
+        return null;
     }
 
     public IClassInfo getArrayClass(IClassInfo cls, int dims)
@@ -110,7 +145,11 @@ public class ClassManager {
     }
 
     public boolean addClass(YYClass cls) throws CompileException {
-        if (locked) throw new IllegalStateException("Can't add new class");
+        if (locked) {
+            if (cls.ibuf().getOriginFile() != null) {
+                throw new IllegalStateException("Can't add new class");
+            }
+        }
         String clname = cls.getFullName();
         IClassInfo c_ref = (IClassInfo)reflClasses.get(clname);
         if (c_ref != null) { // class can't be added after it is reflected
@@ -119,10 +158,12 @@ public class ClassManager {
         YYClass cls_prv = (YYClass)compClasses.get(clname);
         if (cls_prv != null) {
             cls.reportError((cls.isInterface() ? "Interface " : "Class ") +
-                clname + " already defined in " + cls_prv.ibuf().getFileName());
+                clname + " already defined in " +
+                cls_prv.ibuf().getOriginAsString());
             return false;
         } else {
             compClasses.put(clname, cls);
+            cls.setLibName(compMgr.getCurrentLibName());
             return true;
         }
     }
@@ -176,7 +217,8 @@ public class ClassManager {
     }
 */
     public boolean isAccessibleTo(IMemberInfo m, IClassInfo clsTo,
-            boolean selfcxt) throws CompileException {
+        boolean selfcxt) throws ParseException
+    {
         IClassInfo declCls = m.getDeclaringClass();
         String pkgTo = clsTo.getPackageName();
 
@@ -206,8 +248,7 @@ public class ClassManager {
         }
     }
 
-    public SortedMap getAccessibleFields(IClassInfo cls)
-            throws CompileException {
+    public SortedMap getAccessibleFields(IClassInfo cls) throws ParseException {
         SortedMap result = new TreeMap();
         try {
             if (cls.getWorkingFlag()) { // circularity
@@ -234,7 +275,8 @@ public class ClassManager {
     }
 
     public SortedMap getFields(IClassInfo cls, String name)
-            throws CompileException {
+        throws ParseException
+    {
         return cls.getAccessibleFields().subMap(getFieldLookupKeyFirst(name),
                                                 getFieldLookupKeyLast(name));
     }
@@ -257,7 +299,8 @@ public class ClassManager {
     }
 
     private final SortedMap addFieldsOfClass(SortedMap result,
-            IClassInfo maincls, IClassInfo addcls) throws CompileException {
+        IClassInfo maincls, IClassInfo addcls) throws ParseException
+    {
         Iterator newfields, oldfields;
 
         newfields = (maincls == addcls)
@@ -287,8 +330,7 @@ enumnew:
 
     // this is for nonarray reference types, JLS 5.1.4
     // rules for arrays are defined in ArrayType.java
-    public Map getAssignableClasses(IClassInfo cls)
-            throws CompileException {
+    public Map getAssignableClasses(IClassInfo cls) throws ParseException {
         HashMap result = new HashMap();
         addAssignableClasses(cls, result);
         // any class or _interface_ is assignable from Object
@@ -298,7 +340,8 @@ enumnew:
     }
 
     private void addAssignableClasses(IClassInfo cls, HashMap result)
-            throws CompileException {
+        throws ParseException
+    {
         try {
             if (cls.getWorkingFlag()) { // circularity
                 reportError(cls, "Circularity detected: " + cls +
@@ -327,7 +370,8 @@ enumnew:
     // rules for java.lang.Object are in ClassInfoReflected.java
     // rules for arrays are in ArrayType.java
     public boolean isCastableTo(IClassInfo s, IClassInfo t)
-            throws CompileException {
+        throws ParseException
+    {
         if (!t.isReference()) return false;
         if (!s.isInterface()) {
             if (!t.isInterface()) { // class -> class
@@ -366,17 +410,17 @@ enumnew:
     public boolean isNumericOrNativeType(IClassInfo cls) {
         try {
             return cls == NATIVETYPE || cls.isAssignableFrom(DOUBLE);
-        } catch (CompileException e) { throw new RuntimeException(); }
+        } catch (ParseException e) { throw new RuntimeException(); }
     }
 
     public boolean isIntegralOrNativeType(IClassInfo cls) {
         try {
             return cls == NATIVETYPE || cls.isAssignableFrom(LONG);
-        } catch (CompileException e) { throw new RuntimeException(); }
+        } catch (ParseException e) { throw new RuntimeException(); }
     }
 
     public SortedMap getAccessibleMethods(IClassInfo cls)
-            throws CompileException {
+            throws ParseException {
         SortedMap result = new TreeMap();
         try {
             if (cls.getWorkingFlag()) { // circularity
@@ -418,16 +462,17 @@ enumnew:
     }
 
     public SortedMap getMethods(IClassInfo cls, String name)
-            throws CompileException {
+            throws ParseException {
         return getMethods(cls.getAccessibleMethods(), name);
     }
 
     public SortedMap getMethods(IClassInfo cls, String name,
-            String jlssignature) throws CompileException {
+        String jlssignature) throws ParseException
+    {
         return getMethods(cls.getAccessibleMethods(), name, jlssignature);
     }
 
-    public static String getMethodKey(IMethodInfo mth) throws CompileException {
+    public static String getMethodKey(IMethodInfo mth) throws ParseException {
         return mth.getName() + " " + mth.getJLSSignature() +
            " in " + mth.getDeclaringClass().getJNIName();
     }
@@ -500,7 +545,7 @@ enumnew:
     }
 
     private SortedMap addMethodsOfClass(SortedMap result, IClassInfo maincls,
-            IClassInfo addcls) throws CompileException {
+            IClassInfo addcls) throws ParseException {
         Iterator newmethods, oldmethods;
         newmethods = (maincls == addcls)
             ? maincls.getDeclaredMethods().values().iterator()
@@ -575,14 +620,14 @@ enumnew:
         return result;
     }
 
-    public boolean isUncheckedException(IClassInfo exc)
-            throws CompileException {
+    public boolean isUncheckedException(IClassInfo exc) throws ParseException {
         return exc.isSubclassOf(this.RuntimeException) ||
             exc.isSubclassOf(this.Error);
     }
 
     private boolean returnTypeCompatible(IMethodInfo oldmth,
-            IMethodInfo newmth) throws CompileException {
+        IMethodInfo newmth) throws ParseException
+    {
         return equals(newmth.getReturnType(), oldmth.getReturnType());
     }
 
@@ -596,7 +641,7 @@ enumnew:
     }
 
     private String getIncompatibleExceptions(IMethodInfo oldmth,
-            IMethodInfo newmth) throws CompileException { // JLS 8.4.4
+            IMethodInfo newmth) throws ParseException { // JLS 8.4.4
         Iterator i = newmth.getExceptionTypes().values().iterator();
         while (i.hasNext()) {
             IClassInfo exc = (IClassInfo)i.next();
@@ -652,7 +697,8 @@ enumnew:
      * Does excs contain e (or its superclass)?
      */
     public final static boolean containsException(Collection excs, IClassInfo e)
-            throws CompileException {
+        throws ParseException
+    {
 //        if (excs == null) return false;
         for(Iterator i = excs.iterator(); i.hasNext();) {
             if (e.isSubclassOf((IClassInfo)i.next())) {
@@ -663,7 +709,7 @@ enumnew:
     }
 
     public final static boolean canThrow(IMethodInfo mth, IClassInfo e)
-            throws CompileException {
+            throws ParseException {
         return containsException(mth.getExceptionTypes().values(), e);
     }
 
@@ -708,7 +754,7 @@ enumnew:
     //}
 
     public IClassInfo tryResolveAsType(String refpkgname, String clsname,
-            YYCompilationUnit compUnit) throws CompileException {
+            YYCompilationUnit compUnit) throws ParseException {
         IClassInfo result;
         String curpkgname = compUnit.getPackageName();
         if (refpkgname == "") { // simple name
@@ -757,7 +803,8 @@ enumnew:
     }
 
     private static boolean isMoreSpecific(IMethodInfo m1, IMethodInfo m2)
-            throws CompileException {
+        throws ParseException
+    {
         if (!m1.getDeclaringClass().isAssignableFrom(m2.getDeclaringClass())) {
             return false;
         }
@@ -771,8 +818,9 @@ enumnew:
     }
 
     public IMethodInfo findTheMostSpecific(Collection whereToSearch,
-            boolean isConstructor, IClassInfo[] argtypes, IClassInfo enclClass,
-            boolean selfcxt) throws CompileException {
+        boolean isConstructor, IClassInfo[] argtypes, IClassInfo enclClass,
+        boolean selfcxt) throws ParseException
+    {
         Iterator methods = whereToSearch.iterator();
         IMethodInfo applicable = null;
         int noOfApplicables = 0;
@@ -846,7 +894,7 @@ methods:
             YYClass c = (YYClass)i.next();
             try {
                 s += c.getFullName() + ":\n" + c.describe() + "\n";
-            } catch (CompileException e) {
+            } catch (ParseException e) {
                 throw new RuntimeException();
             }
         }

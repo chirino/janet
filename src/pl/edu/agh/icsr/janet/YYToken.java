@@ -42,7 +42,7 @@ public class YYToken implements YYResultReceiver {
 
     int token_type = TokenTypes.YYNONE;
 
-    // Token position in InputBuffer
+    // Token position in JanetSourceReader
     YYLocation token_beg;
     YYLocation token_end;
 

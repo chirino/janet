@@ -76,7 +76,7 @@ public class YYArrayCreationExpression extends YYExpression {
         return dimexprs;
     }
 
-    public void resolve(boolean isSubexpression) throws CompileException {
+    public void resolve(boolean isSubexpression) throws ParseException {
         // resolve base type
         baseType = unresolvedBaseType.getResolvedType();
 

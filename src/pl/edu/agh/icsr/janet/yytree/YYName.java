@@ -71,7 +71,7 @@ public class YYName extends YYNode implements IDetailedLocationContext {
     }
 
 /*    public String getSeparator() {
-	return ".";
+        return ".";
     }
 */
 
@@ -101,7 +101,7 @@ public class YYName extends YYNode implements IDetailedLocationContext {
      * IClassInfo, if Name represents type
      * YYFieldAccessExpression, if Name represents field access
      */
-    public Object reclassify() throws CompileException {
+    public Object reclassify() throws ParseException {
         return lastNameNode().reclassify();
     }
 

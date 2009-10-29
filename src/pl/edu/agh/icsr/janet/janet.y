@@ -296,7 +296,9 @@ import pl.edu.agh.icsr.janet.natives.YYNativeCode;
 // 19.2: The Syntactic Grammar
 
 Goal 
-    : { setNativeLanguage("c"); compUnit = new YYCompilationUnit(cxt, compMgr); pushScope(compUnit); }
+    : { setNativeLanguage("c"); 
+        compUnit = new YYCompilationUnit(cxt, compMgr, doProcessThisFile); 
+        pushScope(compUnit); }
           CompilationUnit 
       { popScope(); $$ = compUnit.expand(cxt); }
     ;
@@ -1321,11 +1323,11 @@ public static void reportError(ILocationContext cxt, String msg) throws CompileE
 public static void reportError(ILocationContext cxt, String msg, boolean errthrow)
         throws CompileException {
     YYLocation lbeg = cxt.lbeg();
-    InputBuffer ibuf = cxt.ibuf();
-    String filename = ibuf.getFileName();
+    JanetSourceReader ibuf = cxt.ibuf();
+    String orig = ibuf.getOriginAsString();
     String line = ibuf.getLine(lbeg);
     
-    System.err.println(filename + ":" + (lbeg.lineno+1) + ": " + msg);
+    System.err.println(orig + ":" + (lbeg.lineno+1) + ": " + msg);
     if (line != null && !line.equals("")) {
 	System.err.println(line);
 
@@ -1357,7 +1359,7 @@ public class Context implements IMutableContext {
 
     public final YYLocation lbeg() { return Parser.this.lbeg(); }
     public final YYLocation lend() { return Parser.this.lend(); }
-    public final InputBuffer ibuf() { return yylex.ibuf(); }
+    public final JanetSourceReader ibuf() { return yylex.ibuf(); }
 
     public final void reportError(String msg) throws CompileException {
 	Parser.this.reportError(this, msg, true);
@@ -1401,7 +1403,7 @@ Context cxt = new Context();
 ILocationContext tokencxt = new ILocationContext() {
 	public final YYLocation lbeg() { return yylex.tokenloc(); }
 	public final YYLocation lend() { return Parser.this.lend(); }
-	public final InputBuffer ibuf() { return yylex.ibuf(); }
+	public final JanetSourceReader ibuf() { return yylex.ibuf(); }
 	public final void reportError(String msg) throws CompileException {
 	    Parser.this.reportError(this, msg, true);
 	}

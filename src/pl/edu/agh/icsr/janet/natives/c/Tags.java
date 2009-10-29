@@ -642,7 +642,7 @@ class ExpressionTagForVariableAccess extends ExpressionTag {
         this.varDecl = varDecl;
         try {
             this.owntype = varDecl.getType();
-        } catch (CompileException ex) { throw new RuntimeException(); }
+        } catch (ParseException ex) { throw new RuntimeException(); }
         this.nname = nname;
     }
 

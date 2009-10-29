@@ -65,11 +65,11 @@ public class YYCatchClause extends YYStatement {
     public YYVariableDeclarator getFormalParameter() { return formalParameter; }
     public int getExcClsIdx() { return excclsidx; }
 
-    public IClassInfo getCatchedExceptionType() throws CompileException {
+    public IClassInfo getCatchedExceptionType() throws ParseException {
         return formalParameter.getType();
     }
 
-    public void resolve() throws CompileException {
+    public void resolve() throws ParseException {
         formalParameter.resolve();
         body.resolve();
         IClassInfo exctype = formalParameter.getType();
